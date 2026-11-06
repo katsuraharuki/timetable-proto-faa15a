@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>時間割（試作）</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f5f7; --card:#fff; --ink:#1d1d1f; --sub:#6e6e73; --line:#e3e3e8; --blue:#0071e3; --blue-soft:#e8f2fd;
+  --ng:#d70015; --ng-soft:#fff0f1; --warn:#b25000; --warn-soft:#fff5e8; --ok:#1d8a3a; --ok-soft:#eaf7ee;
+  --c-gen:#e7f0ff; --c-biz:#e3f5e9; --c-care:#fff0e0; --c-fash:#fde9f3; --c-move:#fff8d8; --c-sel:#efeafd; --c-hr:#eff0f3;
+  --r:22px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+html,body{overflow-x:hidden}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans JP","Hiragino Sans","Meiryo",sans-serif;font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrapw{max-width:1180px;margin:0 auto;padding:0 20px}
+/* ナビ（すりガラス） */
+nav{position:sticky;top:0;z-index:50;background:rgba(245,245,247,.72);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid rgba(0,0,0,.06)}
+nav .wrapw{display:flex;align-items:center;height:52px;gap:24px;font-size:13px}
+nav .logo{font-weight:700;font-size:15px;letter-spacing:.02em}
+nav a{color:var(--ink);text-decoration:none;opacity:.8}
+nav a:hover{opacity:1}
+nav .sp{flex:1}
+nav .school{color:var(--sub)}
+@media (max-width:640px){nav .school,nav a.hide{display:none}}
+/* ヒーロー */
+.hero{text-align:center;padding:72px 0 0;overflow:hidden}
+.hero .eye{color:var(--sub);font-weight:500;font-size:17px}
+.hero h1{font-size:clamp(36px,6.4vw,72px);line-height:1.12;letter-spacing:-.02em;font-weight:900;margin:8px 0 16px}
+.hero p{font-size:clamp(16px,2vw,21px);color:var(--sub);max-width:700px;margin:0 auto 26px;line-height:1.55}
+.cta{display:flex;gap:22px;justify-content:center;align-items:center;flex-wrap:wrap}
+.pbtn{background:var(--blue);color:#fff;border:0;border-radius:999px;padding:12px 24px;font:inherit;font-size:16px;cursor:pointer;text-decoration:none}
+.pbtn:hover{background:#0077ed}
+.link{color:var(--blue);text-decoration:none;font-size:16px}
+.link:hover{text-decoration:underline}
+/* 立体の見本 */
+.stage{perspective:1600px;margin:56px auto 0;max-width:980px;height:clamp(240px,40vw,430px);position:relative}
+.mock{position:absolute;inset:0 4% auto;transform-origin:50% 0;transform:rotateX(var(--rx,28deg)) rotateY(var(--ry,0deg)) translateZ(0);transition:transform .25s ease-out;background:#fff;border-radius:22px;box-shadow:0 40px 80px -20px rgba(0,0,0,.25),0 0 0 1px rgba(0,0,0,.05);padding:clamp(10px,2vw,22px)}
+.mock .mh{display:flex;justify-content:space-between;font-size:12px;color:var(--sub);margin-bottom:10px}
+.mock .mh b{color:var(--ink)}
+.mg{display:grid;grid-template-columns:repeat(5,1fr);gap:clamp(4px,.8vw,8px)}
+.mg div{border-radius:10px;padding:clamp(4px,.8vw,10px);font-size:clamp(9px,1.2vw,13px);font-weight:700;min-height:clamp(28px,5vw,58px);opacity:0;transform:translateY(12px);animation:pop .6s ease forwards}
+@keyframes pop{to{opacity:1;transform:none}}
+.glow{position:absolute;left:10%;right:10%;bottom:-40px;height:120px;background:radial-gradient(closest-side,rgba(0,113,227,.18),transparent);filter:blur(10px);z-index:-1}
+/* セクション */
+section.sec{padding:84px 0 0}
+.sec h2{font-size:clamp(28px,4.4vw,48px);letter-spacing:-.015em;font-weight:900;margin:0 0 8px;text-align:center}
+.sec .lead{font-size:clamp(15px,1.8vw,19px);color:var(--sub);text-align:center;max-width:680px;margin:0 auto 34px}
+.rv{opacity:0;transform:translateY(28px);transition:opacity .8s ease,transform .8s ease}
+.rv.in{opacity:1;transform:none}
+/* 案のカード */
+.plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;perspective:1200px}
+@media (max-width:900px){.plans{grid-template-columns:1fr}}
+.plan{background:var(--card);border-radius:var(--r);padding:26px;cursor:pointer;border:2px solid transparent;text-align:left;font:inherit;color:inherit;width:100%;transition:transform .3s ease,box-shadow .3s ease,border-color .2s;box-shadow:0 2px 6px rgba(0,0,0,.04);transform-style:preserve-3d}
+.plan:hover{box-shadow:0 20px 40px -12px rgba(0,0,0,.18)}
+.plan.on{border-color:var(--blue)}
+.plan .tg{font-size:12px;font-weight:700;color:var(--sub);letter-spacing:.08em}
+.plan.on .tg{color:var(--blue)}
+.plan h3{font-size:22px;margin:4px 0 6px;letter-spacing:-.01em}
+.plan p{color:var(--sub);font-size:14px;margin:0 0 16px;min-height:44px}
+.plan .ok{display:inline-flex;gap:6px;align-items:center;font-size:13px;font-weight:700;color:var(--ok);background:var(--ok-soft);border-radius:999px;padding:4px 12px;margin-bottom:12px}
+.plan .ok.ng{color:var(--ng);background:var(--ng-soft)}
+.m{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid var(--line);padding:9px 0;font-size:14px;color:var(--sub)}
+.m b{font-size:19px;color:var(--ink);font-weight:700}
+.m b.best{color:var(--blue)}
+.note{font-size:12.5px;color:var(--sub);text-align:center;margin-top:12px}
+/* 作業エリア */
+.board{background:var(--card);border-radius:28px;padding:18px;box-shadow:0 30px 60px -30px rgba(0,0,0,.25)}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.seg{display:inline-flex;background:#ececf0;border-radius:999px;padding:3px}
+.seg button{font:inherit;font-size:14px;border:0;background:none;padding:6px 16px;border-radius:999px;cursor:pointer;color:var(--ink)}
+.seg button.on{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12);font-weight:700}
+.planname{font-size:14px;color:var(--sub)}
+.planname b{color:var(--ink)}
+.sp{flex:1}
+.ghostbtn{font:inherit;font-size:13.5px;border:0;background:none;color:var(--blue);cursor:pointer;padding:6px 8px}
+.ghostbtn:disabled{color:#b8b8bd;cursor:default}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.pill{font:inherit;font-size:13.5px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 13px;cursor:pointer;color:var(--ink)}
+.pill.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.pill .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ng);margin-left:6px;vertical-align:middle}
+select{font:inherit;padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;min-width:220px}
+.hint{font-size:13px;color:var(--sub);margin:0 0 10px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}
+@media (max-width:1020px){.layout{grid-template-columns:minmax(0,1fr)}}
+.scroll{overflow-x:auto}
+table.grid{border-collapse:separate;border-spacing:5px;width:100%}
+table.grid th{font-size:13px;color:var(--sub);font-weight:500;padding:2px}
+table.grid th.p{width:52px;text-align:center}
+table.grid th.p small{display:block;font-size:10.5px}
+td.slot{background:#f7f7f9;border:2px dashed transparent;border-radius:14px;vertical-align:top;height:84px;min-width:112px;padding:3px}
+@media (max-width:600px){td.slot{min-width:90px}}
+td.slot.off{background:repeating-linear-gradient(45deg,#f3f3f5,#f3f3f5 6px,#ebebee 6px,#ebebee 12px)}
+td.slot.can{border-color:#34c759;background:#f0fbf3}
+td.slot.cant{border-color:#ff6961;background:#fff3f2}
+td.slot.over{outline:3px solid var(--blue);outline-offset:1px}
+.lunch{font-size:11px;color:var(--sub);text-align:center;letter-spacing:.2em}
+.chip{position:relative;border-radius:11px;padding:7px 9px;margin-bottom:3px;user-select:none;-webkit-user-select:none;transition:opacity .2s,transform .2s}
+.board.edit .chip{cursor:grab;touch-action:none}
+.board.edit .chip:hover{transform:translateY(-1px)}
+.lock{display:inline-flex;align-items:center;gap:8px;font:inherit;font-size:14px;border:0;background:none;cursor:pointer;color:var(--ink);padding:4px 2px}
+.lock .sw{width:40px;height:24px;border-radius:999px;background:#d1d1d6;position:relative;transition:background .2s;flex:none}
+.lock .sw::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .2s}
+.lock.on .sw{background:var(--ok)} .lock.on .sw::after{left:18px}
+.mode{display:inline-flex;background:#e9e9ee;border-radius:12px;padding:3px;gap:3px}
+.mode button{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:9px;padding:8px 16px;cursor:pointer;background:none;color:var(--sub);display:inline-flex;align-items:center;gap:6px}
+.mode button svg{width:16px;height:16px}
+.mode button.on[data-mode=view]{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.mode button.on[data-mode=edit]{background:var(--ok);color:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.modebar{display:flex;gap:12px;align-items:center;border-radius:14px;padding:12px 16px;margin-bottom:12px;font-size:14px;line-height:1.55}
+.modebar b{font-size:15px;white-space:nowrap}
+.modebar.view{background:#f0f0f3;color:#3a3a3f}
+.modebar.edit{background:var(--ok-soft);color:#14532d;box-shadow:inset 0 0 0 2px var(--ok)}
+.modebar i{font-style:normal;display:inline-block;width:11px;height:11px;border-radius:3px;vertical-align:-1px;margin:0 3px}
+.board.edit .scroll{box-shadow:0 0 0 2px var(--ok);border-radius:12px}
+.board.edit .chip:not(.ng):not(.warn){outline:1.5px dashed rgba(29,138,58,.55);outline-offset:-1.5px}
+.board:not(.edit) .chip{cursor:default}
+@media (max-width:600px){.modebar{flex-direction:column;align-items:flex-start;gap:4px}}
+.moved-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--blue-soft);border-radius:14px;padding:10px 14px;margin-bottom:12px;font-size:14px}
+.moved-bar b{color:var(--blue)}
+#print{display:none}
+.chip .s{font-weight:700;font-size:13.5px;line-height:1.35}
+.chip .t{font-size:12px;color:#4a4a50}
+.chip .r{font-size:11.5px;color:#6e6e73}
+.chip .tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:3px}
+.tag{font-size:10.5px;border-radius:999px;padding:0 6px;background:rgba(255,255,255,.75)}
+.chip.ng{box-shadow:0 0 0 2.5px var(--ng)}
+.chip.warn{box-shadow:0 0 0 2.5px #ff9f0a}
+.chip.moved::after{content:"";position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--blue)}
+.chip.dim{opacity:.25}
+.chip.flash{animation:flash 1s ease 2}
+@keyframes flash{50%{transform:scale(1.05);box-shadow:0 0 0 4px var(--blue)}}
+.busy{font-size:11px;color:#8a8a90;border:1px dashed #c7c7cc;border-radius:10px;padding:4px 6px;background:#fff}
+.g-gen{background:var(--c-gen)} .g-biz{background:var(--c-biz)} .g-care{background:var(--c-care)} .g-fash{background:var(--c-fash)}
+.g-move{background:var(--c-move)} .g-sel{background:var(--c-sel)} .g-hr{background:var(--c-hr)}
+.ghost{position:fixed;pointer-events:none;z-index:100;opacity:.95;transform:rotate(-3deg) scale(1.04);box-shadow:0 18px 36px rgba(0,0,0,.22);width:150px}
+table.all{border-collapse:collapse;font-size:12px}
+table.all th,table.all td{border:1px solid var(--line);padding:2px;text-align:center}
+table.all th{background:#f7f7f9;font-weight:500;color:var(--sub)}
+table.all td.slot{height:auto;min-width:60px;border-radius:0;border:1px solid var(--line);background:#fff}
+table.all td.slot.can{background:#eaf9ee} table.all td.slot.cant{background:#ffeceb}
+table.all .chip{padding:3px 4px;margin:0;border-radius:6px}
+table.all .chip .s{font-size:11.5px} table.all .chip .tags{display:none}
+table.all .chip .r,table.all .chip .t{font-size:10px;line-height:1.25;color:#55555a}
+table.all td.slot{min-width:72px}
+table.all td.cls{text-align:left;white-space:nowrap;font-weight:700;background:#fafafa;position:sticky;left:0;z-index:1;padding:0 8px}
+/* 右側 */
+.side{display:flex;flex-direction:column;gap:14px}
+.box{background:#f7f7f9;border-radius:18px;padding:16px}
+.box h4{margin:0;font-size:16px}
+.box .sub{font-size:12.5px;color:var(--sub);margin:2px 0 10px}
+.total{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.ring{--p:100;width:52px;height:52px;border-radius:50%;background:conic-gradient(var(--ok) calc(var(--p)*1%),#e3e3e8 0);display:grid;place-items:center;flex:none}
+.ring span{width:40px;height:40px;border-radius:50%;background:#f7f7f9;display:grid;place-items:center;font-size:12px;font-weight:700}
+.total b{font-size:20px}
+.cr{display:grid;grid-template-columns:minmax(0,1fr) auto 40px;gap:8px;align-items:center;font-size:13.5px;padding:5px 6px;border-radius:9px;cursor:default}
+.cr:hover{background:#fff}
+.cr .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr .nm small{color:var(--sub);font-size:11px;margin-left:5px}
+.dots{display:flex;gap:3px;flex-wrap:wrap;max-width:110px;justify-content:flex-end}
+.dots i{width:9px;height:9px;border-radius:50%;background:var(--blue);display:block}
+.cr .num{font-weight:700;text-align:right;font-size:13px}
+.cr .num.ng{color:var(--ng)}
+.grp{border-radius:14px;background:#fff;margin-bottom:8px;overflow:hidden}
+.grp .gh{display:flex;gap:10px;align-items:center;padding:11px 12px}
+.grp .ic{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:14px;font-weight:700;flex:none}
+.grp.ok .ic{background:var(--ok-soft);color:var(--ok)}
+.grp.ng .ic{background:var(--ng);color:#fff} .grp.ng{box-shadow:inset 0 0 0 1.5px #ffc2c6}
+.grp.warn .ic{background:#ff9f0a;color:#fff} .grp.warn{box-shadow:inset 0 0 0 1.5px #ffd8a6}
+.grp .gt{font-weight:700;font-size:14px}
+.grp .gs{font-size:12px;color:var(--sub)}
+.grp ul{margin:0;padding:0 12px 10px 28px;font-size:13px}
+.grp li{margin:4px 0;cursor:pointer}
+.grp li:hover{color:var(--blue)}
+.changes{font-size:13px;margin:0;padding-left:18px;color:var(--sub)}
+.legend{display:flex;gap:8px;flex-wrap:wrap;font-size:11.5px;margin-top:10px;color:var(--sub)}
+.legend span{display:inline-flex;align-items:center;gap:4px}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+footer{padding:70px 0 50px;color:var(--sub);font-size:12px;text-align:center}
+footer .sign{color:var(--ink);font-size:13px;margin-top:6px}
+.rdlg{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:150;display:flex;align-items:center;justify-content:center;padding:16px}
+.rdlg .in{background:#fff;border-radius:18px;max-width:520px;width:100%;max-height:88vh;overflow:auto;padding:20px 20px 16px;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+.rdlg h3{margin:0 0 4px;font-size:18px} .rdlg .sub{font-size:13px;color:var(--sub);margin-bottom:12px}
+.rdlg .rl{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-bottom:12px}
+.rdlg .rl button{font:inherit;font-size:14px;text-align:left;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px 10px;cursor:pointer}
+.rdlg .rl button small{display:block;font-size:11.5px;color:var(--sub)}
+.rdlg .rl button.on{border-color:var(--blue);background:var(--blue-soft)}
+.rdlg .rl button.use small{color:#c2410c}
+.rdlg .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;font-size:14px}
+.rdlg input[type=text]{font:inherit;font-size:15px;flex:1;min-width:160px;border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.rdlg .btns{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:6px}
+.rdlg .btns button{font:inherit;font-size:14px;border:0;border-radius:10px;padding:9px 16px;cursor:pointer;background:#e9e9ee}
+.rdlg .btns button.pri{background:var(--blue);color:#fff;font-weight:600}
+.chip .r.hand{color:var(--blue);font-weight:700}
+.outbtn{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:10px;padding:9px 16px;cursor:pointer;background:var(--ink);color:#fff;display:inline-flex;align-items:center;gap:7px}
+.outbtn svg{width:17px;height:17px}
+.outdlg .in{max-width:560px}
+.outdlg .opt{display:flex;gap:14px;align-items:flex-start;width:100%;text-align:left;font:inherit;border:1px solid var(--line);background:#fff;border-radius:14px;padding:13px 15px;margin-bottom:8px;cursor:pointer}
+.outdlg .opt:hover{border-color:var(--blue);background:var(--blue-soft)}
+.outdlg .opt .ic{flex:none;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:19px;background:#f0f0f3}
+.outdlg .opt b{display:block;font-size:15px;margin-bottom:2px}
+.outdlg .opt span{font-size:12.5px;color:var(--sub);line-height:1.5}
+.outdlg h4{font-size:13px;color:var(--sub);margin:12px 0 6px;font-weight:600}
+/* 学校の様式で動かす画面 */
+.layout.wide{grid-template-columns:minmax(0,1fr)}
+.layout.wide .side{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;align-items:start}
+.sbd{margin-bottom:26px;scroll-margin-top:70px}
+.sbd .sbh{display:flex;align-items:baseline;gap:12px;margin:0 0 6px}
+.sbd .sbh b{font-size:20px}
+.sbd .sbh span{font-size:13px;color:var(--sub)}
+table.scb{border-collapse:collapse;width:100%;min-width:1080px;table-layout:fixed;font-size:12px;background:#fff}
+table.scb th,table.scb td{border:1px solid #c9c9cf;padding:2px;vertical-align:top}
+table.scb th{background:#f4f4f6;font-weight:600;color:#3a3a3f;text-align:center;font-size:12px;padding:3px}
+table.scb th small{display:block;font-weight:400;color:var(--sub);font-size:10.5px}
+table.scb th .ct{display:flex;border-top:1px solid #dedee3;margin-top:3px;padding-top:2px;font-weight:400;font-size:10.5px;color:var(--sub)}
+table.scb th .ct i{font-style:normal;flex:1} table.scb th .ct i+i{flex:0 0 38%;border-left:1px solid #dedee3}
+table.scb td.vt{writing-mode:vertical-rl;text-align:center;vertical-align:middle;font-weight:700;letter-spacing:.15em;background:#fafafa;font-size:12px}
+table.scb td.cn{font-weight:700;vertical-align:middle;text-align:center;background:#fafafa;font-size:12.5px}
+table.scb td.cn small{display:block;font-weight:400;color:var(--sub);font-size:10.5px}
+table.scb td.slot{height:auto;min-height:44px;border-radius:0;background:#fff}
+table.scb td.slot.can{background:#eaf9ee} table.scb td.slot.cant{background:#ffeceb}
+table.scb td.none{background:#f7f7f9}
+table.scb tr.sp td{height:5px;padding:0;background:#fff3a0;border-color:#e8dc8a}
+table.scb td.lo{font-size:11.5px;color:#55555a}
+table.scb td.lo .lw{display:flex;gap:4px} table.scb td.lo .lw>div:first-child{flex:1} table.scb td.lo .lw>div+div{flex:0 0 38%;border-left:1px dashed #d4d4d8;padding-left:4px}
+.chip.sc{display:flex;gap:4px;padding:4px 5px;margin:0 0 2px;border-radius:7px}
+.chip.sc .l{flex:1;min-width:0} .chip.sc .tt{flex:0 0 38%;font-size:11px;color:#3a3a3f;border-left:1px dashed rgba(0,0,0,.15);padding-left:4px;line-height:1.3}
+.chip.sc .s{font-size:12px;line-height:1.3} .chip.sc .r{font-size:10.5px;line-height:1.25}
+.chip.sc .tags{display:none}
+.jump{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.jump span{font-size:13px;color:var(--sub);margin-right:4px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(10px);background:rgba(29,29,31,.92);backdrop-filter:blur(10px);color:#fff;padding:11px 18px;border-radius:999px;font-size:14px;z-index:200;opacity:0;transition:all .25s;pointer-events:none;max-width:90vw}
+.toast.show{opacity:1;transform:translateX(-50%)}
+/* 印刷：A4横。画面の飾りは消して、表だけを白黒でも読める形で出す */
+@page{size:A4 landscape;margin:10mm}
+@media print{
+  body{background:#fff;font-size:10pt}
+  body>*:not(#print){display:none!important}
+  #print{display:block;color:#000}
+  #print h1{font-size:15pt;margin:0 0 2mm}
+  #print .meta{font-size:9pt;color:#444;margin:0 0 3mm}
+  #print .pg{break-after:page}
+  #print .pg:last-child{break-after:auto}
+  #print table{border-collapse:collapse;width:100%;table-layout:fixed}
+  #print th,#print td{border:.6pt solid #555;padding:1mm 1.2mm;vertical-align:top;text-align:center}
+  #print th{background:#eee;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #print td .s{font-weight:700;line-height:1.3}
+  #print td .t{font-size:8pt;color:#333}
+  #print .wk td{height:27mm;font-size:10.5pt}
+  #print .wk th.p{width:16mm}
+  #print .al td,#print .al th{font-size:7pt;padding:.6mm .4mm}
+  #print .al td.cls{text-align:left;font-weight:700;width:20mm}
+  #print .lunch td{height:auto;font-size:8pt;color:#555;padding:.4mm}
+  #print .sch h1{text-align:center;font-size:14pt;letter-spacing:.2em;margin:0 0 1.5mm}
+  #print table.sc{font-size:6.6pt;line-height:1.25}
+  #print table.sc td,#print table.sc th{border:.5pt solid #333;padding:.4mm .5mm;vertical-align:middle;text-align:left;white-space:pre-line;font-weight:400;background:none}
+  #print table.sc .hd{text-align:center;background:#f2f2f2;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #print table.sc .cn{font-weight:700;text-align:center}
+  #print table.sc .vt{writing-mode:vertical-rl;text-align:center;letter-spacing:.15em;font-weight:700}
+  #print table.sc .day{font-size:20pt}
+  #print table.sc .sp td{height:1mm;padding:0;background:#fff3a0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  #print .sch .foot{display:flex;justify-content:space-between;font-size:8pt;margin-top:1mm}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}.mg div{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<nav><div class="wrapw"><span class="logo">時間割</span><a href="#plans">案をくらべる</a><a class="hide" href="#edit">時間割を整える</a><span class="sp"></span><span class="school">立修館高等専修学校 様　令和8年度前期</span></div></nav>
+
+<header class="hero">
+  <div class="wrapw">
+    <div class="eye">令和8年度前期 時間割</div>
+    <h1>時間割を、<br>もっとかんたんに。</h1>
+    <p>条件を守った案から選んで、指で動かして整えるだけ。<br>先生の重なりや無理は、その場でお知らせします。</p>
+    <div class="cta"><a class="pbtn" href="#edit">時間割を見る</a><a class="link" href="#plans">案をくらべる ›</a></div>
+  </div>
+  <div class="stage" id="stage"><div class="mock" id="mock"></div><div class="glow"></div></div>
+</header>
+
+<section class="sec" id="plans">
+  <div class="wrapw">
+    <h2 class="rv">2つの案と、今の時間割。</h2>
+    <p class="lead rv">どちらの案も、先生の出勤日・兼務・教室・必要なコマ数をすべて守っています。選ぶと、下の時間割が切り替わります。</p>
+    <div class="plans" id="planCards"></div>
+    <p class="note rv">青い数字は、3つの中でいちばん良い値です。</p>
+  </div>
+</section>
+
+<section class="sec" id="edit">
+  <div class="wrapw">
+    <h2 class="rv">動かして、整える。</h2>
+    <p class="lead rv">最初は「見るだけ」なので、触っても授業は動きません。直したい時は「動かす」に切り替えて、授業をつかんで別のマスへ。緑のマスなら、そのまま置けます。</p>
+    <div class="board rv" id="board"></div>
+  </div>
+</section>
+
+<footer><div class="wrapw">試作版です。必要なコマ数・先生の出勤日は、令和8年度前期の時間割から読み取った値です。先生のお名前は記号（A先生・B先生…）に置き換えています。<div class="sign">ご提案　桂 治希</div></div></footer>
+<div class="toast" id="toast"></div>
+<div id="print"></div>
+
+<script>
+const DATA = {"classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻", "高等科2年ファッション専攻", "高等科2年きもの専攻", "高等科3年ファッション専攻", "高等科3年きもの専攻", "経理情報科1年", "経理情報科2年", "経理情報科3年", "福祉科1年", "福祉科2年", "福祉科3年"], "days": ["月", "火", "水", "木", "金"], "periods": [1, 2, 3, 4, 5], "zagaku": ["国語", "英語", "数学", "日本史", "倫理", "世界史", "公共", "政治経済", "漢字検定", "社会人常識マナー", "礼法", "ペン字", "美術", "音楽", "時事問題", "マーケティング", "商品と流通", "ビジネスの基礎", "ビジネスの応用", "社会福祉の基礎", "こころとからだの理解", "家庭総合"], "outside": ["外部(固定)", "外部", "非常勤", "固定"], "lessons": [{"id": 0, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻"], "label": {"高等科1年ファッション専攻": "食物", "高等科1年きもの専攻": "食物"}, "subject": {"高等科1年ファッション専攻": "食物", "高等科1年きもの専攻": "食物"}, "teachers": ["A"], "rooms": [], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["A"], "高等科1年きもの専攻": ["A"]}, "roomBy": {"高等科1年ファッション専攻": "学生会館3階", "高等科1年きもの専攻": "学生会館3階"}, "allRooms": ["学生会館3階"]}, {"id": 1, "classes": ["高等科2年ファッション専攻", "高等科2年きもの専攻", "経理情報科2年", "福祉科2年"], "label": {"高等科2年ファッション専攻": "日本史", "高等科2年きもの専攻": "日本史", "経理情報科2年": "日本史", "福祉科2年": "日本史"}, "subject": {"高等科2年ファッション専攻": "日本史", "高等科2年きもの専攻": "日本史", "経理情報科2年": "日本史", "福祉科2年": "日本史"}, "teachers": ["理事長"], "rooms": [], "fixed": true, "teachersBy": {"高等科2年ファッション専攻": ["理事長"], "高等科2年きもの専攻": ["理事長"], "経理情報科2年": ["理事長"], "福祉科2年": ["理事長"]}, "roomBy": {"高等科2年ファッション専攻": "本館2階", "高等科2年きもの専攻": "本館2階", "経理情報科2年": "本館2階", "福祉科2年": "本館2階"}, "allRooms": ["本館2階"]}, {"id": 2, "classes": ["高等科3年ファッション専攻", "高等科3年きもの専攻"], "label": {"高等科3年ファッション専攻": "洋裁", "高等科3年きもの専攻": "和裁"}, "subject": {"高等科3年ファッション専攻": "洋裁", "高等科3年きもの専攻": "和裁"}, "teachers": ["B"], "rooms": ["和裁教室"], "fixed": false, "teachersBy": {"高等科3年ファッション専攻": ["B"], "高等科3年きもの専攻": ["B"]}, "roomBy": {"高等科3年ファッション専攻": "学生会館2階", "高等科3年きもの専攻": "和裁教室"}, "allRooms": ["和裁教室", "学生会館2階"]}, {"id": 3, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "電卓"}, "subject": {"経理情報科1年": "電卓"}, "teachers": ["G"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科1年": ["G"]}, "roomBy": {"経理情報科1年": "本館3階奥"}, "allRooms": ["本館3階奥"]}, {"id": 4, "classes": ["経理情報科3年"], "label": {"経理情報科3年": "ビジネスの応用①"}, "subject": {"経理情報科3年": "ビジネスの応用"}, "teachers": ["H"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科3年": ["H"]}, "roomBy": {"経理情報科3年": "本館3階"}, "allRooms": ["本館3階"]}, {"id": 5, "classes": ["福祉科1年"], "label": {"福祉科1年": "保健体育"}, "subject": {"福祉科1年": "保健体育"}, "teachers": ["F"], "rooms": [], "fixed": false, "teachersBy": {"福祉科1年": ["F"]}, "roomBy": {"福祉科1年": "本館2階奥"}, "allRooms": ["本館2階奥"]}, {"id": 6, "classes": ["福祉科3年"], "label": {"福祉科3年": "家庭総合"}, "subject": {"福祉科3年": "家庭総合"}, "teachers": ["J"], "rooms": [], "fixed": false, "teachersBy": {"福祉科3年": ["J"]}, "roomBy": {"福祉科3年": "学生会館1階"}, "allRooms": ["学生会館1階"]}, {"id": 7, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻"], "label": {"高等科1年ファッション専攻": "スタイル画", "高等科1年きもの専攻": "スタイル画"}, "subject": {"高等科1年ファッション専攻": "スタイル画", "高等科1年きもの専攻": "スタイル画"}, "teachers": ["J"], "rooms": [], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["J"], "高等科1年きもの専攻": ["J"]}, "roomBy": {"高等科1年ファッション専攻": "学生会館3階", "高等科1年きもの専攻": "学生会館3階"}, "allRooms": ["学生会館3階"]}, {"id": 8, "classes": ["高等科2年ファッション専攻", "高等科2年きもの専攻", "経理情報科2年", "福祉科2年"], "label": {"高等科2年ファッション専攻": "数学", "高等科2年きもの専攻": "数学", "経理情報科2年": "数学", "福祉科2年": "数学"}, "subject": {"高等科2年ファッション専攻": "数学", "高等科2年きもの専攻": "数学", "経理情報科2年": "数学", "福祉科2年": "数学"}, "teachers": ["C", "Q"], "rooms": [], "fixed": false, "teachersBy": {"高等科2年ファッション専攻": ["C", "Q"], "高等科2年きもの専攻": ["C", "Q"], "経理情報科2年": ["C", "Q"], "福祉科2年": ["C", "Q"]}, "roomBy": {"高等科2年ファッション専攻": "本館2階・学生会館1階", "高等科2年きもの専攻": "本館2階・学生会館1階", "経理情報科2年": "本館2階・学生会館1階", "福祉科2年": "本館2階・学生会館1階"}, "allRooms": ["学生会館1階", "本館2階"]}, {"id": 9, "classes": ["高等科3年ファッション専攻", "高等科3年きもの専攻", "福祉科1年"], "label": {"高等科3年ファッション専攻": "洋裁", "高等科3年きもの専攻": "和裁", "福祉科1年": "食物"}, "subject": {"高等科3年ファッション専攻": "洋裁", "高等科3年きもの専攻": "和裁", "福祉科1年": "食物"}, "teachers": ["A", "B"], "rooms": ["和裁教室"], "fixed": false, "teachersBy": {"高等科3年ファッション専攻": ["B"], "高等科3年きもの専攻": ["A"], "福祉科1年": ["A"]}, "roomBy": {"高等科3年ファッション専攻": "学生会館2階", "高等科3年きもの専攻": "和裁教室", "福祉科1年": "本館2階奥"}, "allRooms": ["和裁教室", "学生会館2階", "本館2階奥"]}, {"id": 10, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "時事問題①"}, "subject": {"経理情報科1年": "時事問題"}, "teachers": ["D"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科1年": ["D"]}, "roomBy": {"経理情報科1年": "本館3階奥"}, "allRooms": ["本館3階奥"]}, {"id": 11, "classes": ["経理情報科3年", "福祉科3年"], "label": {"経理情報科3年": "HR", "福祉科3年": "HR"}, "subject": {"経理情報科3年": "HR", "福祉科3年": "HR"}, "teachers": ["F"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科3年": ["F"], "福祉科3年": ["F"]}, "roomBy": {"経理情報科3年": "本館3階", "福祉科3年": "本館3階"}, "allRooms": ["本館3階"]}, {"id": 12, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻", "高等科3年ファッション専攻", "高等科3年きもの専攻"], "label": {"高等科1年ファッション専攻": "洋裁(講義)", "高等科1年きもの専攻": "和裁", "高等科3年ファッション専攻": "洋裁", "高等科3年きもの専攻": "和裁"}, "subject": {"高等科1年ファッション専攻": "洋裁", "高等科1年きもの専攻": "和裁", "高等科3年ファッション専攻": "洋裁", "高等科3年きもの専攻": "和裁"}, "teachers": ["A", "B", "D"], "rooms": ["和裁教室"], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["D"], "高等科1年きもの専攻": ["A"], "高等科3年ファッション専攻": ["B"], "高等科3年きもの専攻": ["A"]}, "roomBy": {"高等科1年ファッション専攻": "学生会館1階", "高等科1年きもの専攻": "和裁教室", "高等科3年ファッション専攻": "学生会館2階", "高等科3年きもの専攻": "和裁教室"}, "allRooms": ["和裁教室", "学生会館1階", "学生会館2階"]}, {"id": 13, "classes": ["高等科2年ファッション専攻", "高等科2年きもの専攻", "経理情報科2年", "福祉科2年"], "label": {"高等科2年ファッション専攻": "英語", "高等科2年きもの専攻": "英語", "経理情報科2年": "英語", "福祉科2年": "英語"}, "subject": {"高等科2年ファッション専攻": "英語", "高等科2年きもの専攻": "英語", "経理情報科2年": "英語", "福祉科2年": "英語"}, "teachers": ["E", "F"], "rooms": [], "fixed": false, "teachersBy": {"高等科2年ファッション専攻": ["E", "F"], "高等科2年きもの専攻": ["E", "F"], "経理情報科2年": ["E", "F"], "福祉科2年": ["E", "F"]}, "roomBy": {"高等科2年ファッション専攻": "本館2階・本館3階", "高等科2年きもの専攻": "本館2階・本館3階", "経理情報科2年": "本館2階・本館3階", "福祉科2年": "本館2階・本館3階"}, "allRooms": ["本館2階", "本館3階"]}, {"id": 14, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "ビジネスの基礎①"}, "subject": {"経理情報科1年": "ビジネスの基礎"}, "teachers": ["H"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科1年": ["H"]}, "roomBy": {"経理情報科1年": "本館3階奥"}, "allRooms": ["本館3階奥"]}, {"id": 15, "classes": ["経理情報科3年"], "label": {"経理情報科3年": "数学"}, "subject": {"経理情報科3年": "数学"}, "teachers": ["Q"], "rooms": [], "fixed": true, "teachersBy": {"経理情報科3年": ["Q"]}, "roomBy": {"経理情報科3年": "学生会館3階"}, "allRooms": ["学生会館3階"]}, {"id": 16, "classes": ["福祉科1年"], "label": {"福祉科1年": "簿記"}, "subject": {"福祉科1年": "簿記"}, "teachers": ["I"], "rooms": [], "fixed": false, "teachersBy": {"福祉科1年": ["I"]}, "roomBy": {"福祉科1年": "本館2階奥"}, "allRooms": ["本館2階奥"]}, {"id": 17, "classes": ["福祉科3年"], "label": {"福祉科3年": "ワープロ①"}, "subject": {"福祉科3年": "ワープロ"}, "teachers": ["C"], "rooms": ["パソコン教室"], "fixed": false, "teachersBy": {"福祉科3年": ["C"]}, "roomBy": {"福祉科3年": "パソコン教室"}, "allRooms": ["パソコン教室"]}, {"id": 18, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻", "高等科2年ファッション専攻", "高等科2年きもの専攻", "高等科3年ファッション専攻", "高等科3年きもの専攻"], "label": {"高等科1年ファッション専攻": "洋裁(講義)", "高等科1年きもの専攻": "和裁", "高等科2年ファッション専攻": "色彩", "高等科2年きもの専攻": "和裁", "高等科3年ファッション専攻": "洋裁", "高等科3年きもの専攻": "和裁"}, "subject": {"高等科1年ファッション専攻": "洋裁", "高等科1年きもの専攻": "和裁", "高等科2年ファッション専攻": "色彩", "高等科2年きもの専攻": "和裁", "高等科3年ファッション専攻": "洋裁", "高等科3年きもの専攻": "和裁"}, "teachers": ["A", "B", "D", "R"], "rooms": ["和裁教室"], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["D"], "高等科1年きもの専攻": ["A"], "高等科2年ファッション専攻": ["R"], "高等科2年きもの専攻": ["A"], "高等科3年ファッション専攻": ["B"], "高等科3年きもの専攻": ["A"]}, "roomBy": {"高等科1年ファッション専攻": "学生会館1階", "高等科1年きもの専攻": "和裁教室", "高等科2年ファッション専攻": "多目的棟", "高等科2年きもの専攻": "和裁教室", "高等科3年ファッション専攻": "学生会館2階", "高等科3年きもの専攻": "和裁教室"}, "allRooms": ["和裁教室", "多目的棟", "学生会館1階", "学生会館2階"]}, {"id": 19, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "未来の地図"}, "subject": {"経理情報科1年": "未来の地図"}, "teachers": ["I"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科1年": ["I"]}, "roomBy": {"経理情報科1年": "本館3階奥"}, "allRooms": ["本館3階奥"]}, {"id": 20, "classes": ["経理情報科2年"], "label": {"経理情報科2年": "表計算"}, "subject": {"経理情報科2年": "表計算"}, "teachers": ["F"], "rooms": ["パソコン教室"], "fixed": false, "teachersBy": {"経理情報科2年": ["F"]}, "roomBy": {"経理情報科2年": "パソコン教室"}, "allRooms": ["パソコン教室"]}, {"id": 21, "classes": ["経理情報科3年"], "label": {"経理情報科3年": "簿記①"}, "subject": {"経理情報科3年": "簿記"}, "teachers": ["G"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科3年": ["G"]}, "roomBy": {"経理情報科3年": "本館3階"}, "allRooms": ["本館3階"]}, {"id": 22, "classes": ["福祉科1年"], "label": {"福祉科1年": "数学"}, "subject": {"福祉科1年": "数学"}, "teachers": ["C"], "rooms": [], "fixed": false, "teachersBy": {"福祉科1年": ["C"]}, "roomBy": {"福祉科1年": "本館2階奥"}, "allRooms": ["本館2階奥"]}, {"id": 23, "classes": ["福祉科2年"], "label": {"福祉科2年": "介護実技"}, "subject": {"福祉科2年": "介護実技"}, "teachers": ["S"], "rooms": ["介護実習室"], "fixed": false, "teachersBy": {"福祉科2年": ["S"]}, "roomBy": {"福祉科2年": "介護実習室"}, "allRooms": ["介護実習室"]}, {"id": 24, "classes": ["福祉科3年"], "label": {"福祉科3年": "図画工作"}, "subject": {"福祉科3年": "図画工作"}, "teachers": ["K"], "rooms": [], "fixed": true, "teachersBy": {"福祉科3年": ["K"]}, "roomBy": {"福祉科3年": "本館2階"}, "allRooms": ["本館2階"]}, {"id": 25, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻", "高等科2年ファッション専攻", "高等科2年きもの専攻", "高等科3年ファッション専攻", "高等科3年きもの専攻"], "label": {"高等科1年ファッション専攻": "洋裁", "高等科1年きもの専攻": "和裁", "高等科2年ファッション専攻": "洋裁(講義)", "高等科2年きもの専攻": "和裁", "高等科3年ファッション専攻": "ファッション販売", "高等科3年きもの専攻": "和裁"}, "subject": {"高等科1年ファッション専攻": "洋裁", "高等科1年きもの専攻": "和裁", "高等科2年ファッション専攻": "洋裁", "高等科2年きもの専攻": "和裁", "高等科3年ファッション専攻": "ファッション販売", "高等科3年きもの専攻": "和裁"}, "teachers": ["A", "B", "D", "R"], "rooms": ["和裁教室"], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["B"], "高等科1年きもの専攻": ["A"], "高等科2年ファッション専攻": ["D"], "高等科2年きもの専攻": ["A"], "高等科3年ファッション専攻": ["R"], "高等科3年きもの専攻": ["A"]}, "roomBy": {"高等科1年ファッション専攻": "学生会館2階", "高等科1年きもの専攻": "和裁教室", "高等科2年ファッション専攻": "学生会館1階", "高等科2年きもの専攻": "和裁教室", "高等科3年ファッション専攻": "多目的棟", "高等科3年きもの専攻": "和裁教室"}, "allRooms": ["和裁教室", "多目的棟", "学生会館1階", "学生会館2階"]}, {"id": 26, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "未来の地図"}, "subject": {"経理情報科1年": "未来の地図"}, "teachers": ["I"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科1年": ["I"]}, "roomBy": {"経理情報科1年": "本館3階奥"}, "allRooms": ["本館3階奥"]}, {"id": 27, "classes": ["経理情報科2年"], "label": {"経理情報科2年": "表計算"}, "subject": {"経理情報科2年": "表計算"}, "teachers": ["F"], "rooms": ["パソコン教室"], "fixed": false, "teachersBy": {"経理情報科2年": ["F"]}, "roomBy": {"経理情報科2年": "パソコン教室"}, "allRooms": ["パソコン教室"]}, {"id": 28, "classes": ["経理情報科3年"], "label": {"経理情報科3年": "簿記②"}, "subject": {"経理情報科3年": "簿記"}, "teachers": ["G"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科3年": ["G"]}, "roomBy": {"経理情報科3年": "本館3階"}, "allRooms": ["本館3階"]}, {"id": 29, "classes": ["福祉科1年"], "label": {"福祉科1年": "こころとからだの理解"}, "subject": {"福祉科1年": "こころとからだの理解"}, "teachers": ["T"], "rooms": [], "fixed": false, "teachersBy": {"福祉科1年": ["T"]}, "roomBy": {"福祉科1年": "本館2階奥"}, "allRooms": ["本館2階奥"]}, {"id": 30, "classes": ["福祉科2年"], "label": {"福祉科2年": "介護実技"}, "subject": {"福祉科2年": "介護実技"}, "teachers": ["S"], "rooms": ["介護実習室"], "fixed": false, "teachersBy": {"福祉科2年": ["S"]}, "roomBy": {"福祉科2年": "介護実習室"}, "allRooms": ["介護実習室"]}, {"id": 31, "classes": ["福祉科3年"], "label": {"福祉科3年": "図画工作"}, "subject": {"福祉科3年": "図画工作"}, "teachers": ["K"], "rooms": [], "fixed": true, "teachersBy": {"福祉科3年": ["K"]}, "roomBy": {"福祉科3年": "本館2階"}, "allRooms": ["本館2階"]}, {"id": 32, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻"], "label": {"高等科1年ファッション専攻": "洋裁", "高等科1年きもの専攻": "和裁"}, "subject": {"高等科1年ファッション専攻": "洋裁", "高等科1年きもの専攻": "和裁"}, "teachers": ["A", "B"], "rooms": ["和裁教室"], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["B"], "高等科1年きもの専攻": ["A"]}, "roomBy": {"高等科1年ファッション専攻": "学生会館2階", "高等科1年きもの専攻": "和裁教室"}, "allRooms": ["和裁教室", "学生会館2階"]}, {"id": 33, "classes": ["高等科2年ファッション専攻", "高等科2年きもの専攻", "福祉科2年"], "label": {"高等科2年ファッション専攻": "電卓", "高等科2年きもの専攻": "電卓", "福祉科2年": "電卓"}, "subject": {"高等科2年ファッション専攻": "電卓", "高等科2年きもの専攻": "電卓", "福祉科2年": "電卓"}, "teachers": ["G"], "rooms": [], "fixed": false, "teachersBy": {"高等科2年ファッション専攻": ["G"], "高等科2年きもの専攻": ["G"], "福祉科2年": ["G"]}, "roomBy": {"高等科2年ファッション専攻": "本館3階", "高等科2年きもの専攻": "本館3階", "福祉科2年": "本館3階"}, "allRooms": ["本館3階"]}, {"id": 34, "classes": ["高等科3年ファッション専攻", "高等科3年きもの専攻", "経理情報科3年", "福祉科3年"], "label": {"高等科3年ファッション専攻": "倫理", "高等科3年きもの専攻": "倫理", "経理情報科3年": "倫理", "福祉科3年": "倫理"}, "subject": {"高等科3年ファッション専攻": "倫理", "高等科3年きもの専攻": "倫理", "経理情報科3年": "倫理", "福祉科3年": "倫理"}, "teachers": ["理事長"], "rooms": [], "fixed": true, "teachersBy": {"高等科3年ファッション専攻": ["理事長"], "高等科3年きもの専攻": ["理事長"], "経理情報科3年": ["理事長"], "福祉科3年": ["理事長"]}, "roomBy": {"高等科3年ファッション専攻": "本館2階", "高等科3年きもの専攻": "本館2階", "経理情報科3年": "本館2階", "福祉科3年": "本館2階"}, "allRooms": ["本館2階"]}, {"id": 35, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "ビジネスの基礎②"}, "subject": {"経理情報科1年": "ビジネスの基礎"}, "teachers": ["H"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科1年": ["H"]}, "roomBy": {"経理情報科1年": "本館3階奥"}, "allRooms": ["本館3階奥"]}, {"id": 36, "classes": ["経理情報科2年"], "label": {"経理情報科2年": "ワープロ①"}, "subject": {"経理情報科2年": "ワープロ"}, "teachers": ["C"], "rooms": ["パソコン教室"], "fixed": false, "teachersBy": {"経理情報科2年": ["C"]}, "roomBy": {"経理情報科2年": "パソコン教室"}, "allRooms": ["パソコン教室"]}, {"id": 37, "classes": ["福祉科1年"], "label": {"福祉科1年": "図画工作"}, "subject": {"福祉科1年": "図画工作"}, "teachers": ["L"], "rooms": [], "fixed": true, "teachersBy": {"福祉科1年": ["L"]}, "roomBy": {"福祉科1年": "本館2階奥"}, "allRooms": ["本館2階奥"]}, {"id": 38, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻"], "label": {"高等科1年ファッション専攻": "洋裁", "高等科1年きもの専攻": "和裁"}, "subject": {"高等科1年ファッション専攻": "洋裁", "高等科1年きもの専攻": "和裁"}, "teachers": ["A", "B"], "rooms": ["和裁教室"], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["B"], "高等科1年きもの専攻": ["A"]}, "roomBy": {"高等科1年ファッション専攻": "学生会館2階", "高等科1年きもの専攻": "和裁教室"}, "allRooms": ["和裁教室", "学生会館2階"]}, {"id": 39, "classes": ["高等科2年ファッション専攻", "高等科2年きもの専攻", "福祉科2年"], "label": {"高等科2年ファッション専攻": "社会人常識マナー", "高等科2年きもの専攻": "社会人常識マナー", "福祉科2年": "社会人常識マナー"}, "subject": {"高等科2年ファッション専攻": "社会人常識マナー", "高等科2年きもの専攻": "社会人常識マナー", "福祉科2年": "社会人常識マナー"}, "teachers": ["E"], "rooms": [], "fixed": false, "teachersBy": {"高等科2年ファッション専攻": ["E"], "高等科2年きもの専攻": ["E"], "福祉科2年": ["E"]}, "roomBy": {"高等科2年ファッション専攻": "本館2階", "高等科2年きもの専攻": "本館2階", "福祉科2年": "本館2階"}, "allRooms": ["本館2階"]}, {"id": 40, "classes": ["高等科3年ファッション専攻", "高等科3年きもの専攻", "福祉科3年"], "label": {"高等科3年ファッション専攻": "国語", "高等科3年きもの専攻": "国語", "福祉科3年": "国語"}, "subject": {"高等科3年ファッション専攻": "国語", "高等科3年きもの専攻": "国語", "福祉科3年": "国語"}, "teachers": ["C"], "rooms": [], "fixed": false, "teachersBy": {"高等科3年ファッション専攻": ["C"], "高等科3年きもの専攻": ["C"], "福祉科3年": ["C"]}, "roomBy": {"高等科3年ファッション専攻": "本館3階", "高等科3年きもの専攻": "本館3階", "福祉科3年": "本館3階"}, "allRooms": ["本館3階"]}, {"id": 41, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "体育"}, "subject": {"経理情報科1年": "体育"}, "teachers": ["F"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科1年": ["F"]}, "roomBy": {"経理情報科1年": ""}, "allRooms": []}, {"id": 42, "classes": ["経理情報科2年"], "label": {"経理情報科2年": "簿記①"}, "subject": {"経理情報科2年": "簿記"}, "teachers": ["G"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科2年": ["G"]}, "roomBy": {"経理情報科2年": "学生会館3階"}, "allRooms": ["学生会館3階"]}, {"id": 43, "classes": ["経理情報科3年"], "label": {"経理情報科3年": "ビジネスの応用①"}, "subject": {"経理情報科3年": "ビジネスの応用"}, "teachers": ["H"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科3年": ["H"]}, "roomBy": {"経理情報科3年": "多目的棟"}, "allRooms": ["多目的棟"]}, {"id": 44, "classes": ["福祉科1年"], "label": {"福祉科1年": "図画工作"}, "subject": {"福祉科1年": "図画工作"}, "teachers": ["L"], "rooms": [], "fixed": true, "teachersBy": {"福祉科1年": ["L"]}, "roomBy": {"福祉科1年": "本館2階奥"}, "allRooms": ["本館2階奥"]}, {"id": 45, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻"], "label": {"高等科1年ファッション専攻": "公共", "高等科1年きもの専攻": "公共"}, "subject": {"高等科1年ファッション専攻": "公共", "高等科1年きもの専攻": "公共"}, "teachers": ["H"], "rooms": [], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["H"], "高等科1年きもの専攻": ["H"]}, "roomBy": {"高等科1年ファッション専攻": "学生会館3階", "高等科1年きもの専攻": "学生会館3階"}, "allRooms": ["学生会館3階"]}, {"id": 46, "classes": ["高等科2年ファッション専攻", "高等科2年きもの専攻"], "label": {"高等科2年ファッション専攻": "洋裁", "高等科2年きもの専攻": "和裁"}, "subject": {"高等科2年ファッション専攻": "洋裁", "高等科2年きもの専攻": "和裁"}, "teachers": ["A", "B"], "rooms": ["和裁教室"], "fixed": false, "teachersBy": {"高等科2年ファッション専攻": ["B"], "高等科2年きもの専攻": ["A"]}, "roomBy": {"高等科2年ファッション専攻": "学生会館2階", "高等科2年きもの専攻": "和裁教室"}, "allRooms": ["和裁教室", "学生会館2階"]}, {"id": 47, "classes": ["高等科3年ファッション専攻", "高等科3年きもの専攻"], "label": {"高等科3年ファッション専攻": "ワープロ", "高等科3年きもの専攻": "ワープロ"}, "subject": {"高等科3年ファッション専攻": "ワープロ", "高等科3年きもの専攻": "ワープロ"}, "teachers": ["D"], "rooms": ["パソコン教室"], "fixed": false, "teachersBy": {"高等科3年ファッション専攻": ["D"], "高等科3年きもの専攻": ["D"]}, "roomBy": {"高等科3年ファッション専攻": "パソコン教室", "高等科3年きもの専攻": "パソコン教室"}, "allRooms": ["パソコン教室"]}, {"id": 48, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "体育"}, "subject": {"経理情報科1年": "体育"}, "teachers": ["F"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科1年": ["F"]}, "roomBy": {"経理情報科1年": ""}, "allRooms": []}, {"id": 49, "classes": ["経理情報科2年"], "label": {"経理情報科2年": "社会人常識マナー"}, "subject": {"経理情報科2年": "社会人常識マナー"}, "teachers": ["E"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科2年": ["E"]}, "roomBy": {"経理情報科2年": "本館2階"}, "allRooms": ["本館2階"]}, {"id": 50, "classes": ["経理情報科3年"], "label": {"経理情報科3年": "簿記①"}, "subject": {"経理情報科3年": "簿記"}, "teachers": ["G"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科3年": ["G"]}, "roomBy": {"経理情報科3年": "本館3階"}, "allRooms": ["本館3階"]}, {"id": 51, "classes": ["福祉科1年"], "label": {"福祉科1年": "社会福祉の基礎"}, "subject": {"福祉科1年": "社会福祉の基礎"}, "teachers": ["C"], "rooms": [], "fixed": false, "teachersBy": {"福祉科1年": ["C"]}, "roomBy": {"福祉科1年": "本館2階奥"}, "allRooms": ["本館2階奥"]}, {"id": 52, "classes": ["福祉科2年"], "label": {"福祉科2年": "簿記"}, "subject": {"福祉科2年": "簿記"}, "teachers": ["I"], "rooms": [], "fixed": false, "teachersBy": {"福祉科2年": ["I"]}, "roomBy": {"福祉科2年": "多目的棟"}, "allRooms": ["多目的棟"]}, {"id": 53, "classes": ["福祉科3年"], "label": {"福祉科3年": "調理"}, "subject": {"福祉科3年": "調理"}, "teachers": ["O"], "rooms": [], "fixed": true, "teachersBy": {"福祉科3年": ["O"]}, "roomBy": {"福祉科3年": "学生会館1階"}, "allRooms": ["学生会館1階"]}, {"id": 54, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻"], "label": {"高等科1年ファッション専攻": "体育", "高等科1年きもの専攻": "体育"}, "subject": {"高等科1年ファッション専攻": "体育", "高等科1年きもの専攻": "体育"}, "teachers": ["F"], "rooms": [], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["F"], "高等科1年きもの専攻": ["F"]}, "roomBy": {"高等科1年ファッション専攻": "", "高等科1年きもの専攻": ""}, "allRooms": []}, {"id": 55, "classes": ["高等科2年ファッション専攻", "高等科2年きもの専攻"], "label": {"高等科2年ファッション専攻": "ワープロ", "高等科2年きもの専攻": "ワープロ"}, "subject": {"高等科2年ファッション専攻": "ワープロ", "高等科2年きもの専攻": "ワープロ"}, "teachers": ["E"], "rooms": [], "fixed": false, "teachersBy": {"高等科2年ファッション専攻": ["E"], "高等科2年きもの専攻": ["E"]}, "roomBy": {"高等科2年ファッション専攻": "多目的棟", "高等科2年きもの専攻": "多目的棟"}, "allRooms": ["多目的棟"]}, {"id": 56, "classes": ["高等科3年ファッション専攻", "高等科3年きもの専攻"], "label": {"高等科3年ファッション専攻": "洋裁", "高等科3年きもの専攻": "和裁"}, "subject": {"高等科3年ファッション専攻": "洋裁", "高等科3年きもの専攻": "和裁"}, "teachers": ["A", "B"], "rooms": ["和裁教室"], "fixed": false, "teachersBy": {"高等科3年ファッション専攻": ["B"], "高等科3年きもの専攻": ["A"]}, "roomBy": {"高等科3年ファッション専攻": "学生会館2階", "高等科3年きもの専攻": "和裁教室"}, "allRooms": ["和裁教室", "学生会館2階"]}, {"id": 57, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "簿記"}, "subject": {"経理情報科1年": "簿記"}, "teachers": ["I"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科1年": ["I"]}, "roomBy": {"経理情報科1年": "本館3階奥"}, "allRooms": ["本館3階奥"]}, {"id": 58, "classes": ["経理情報科2年"], "label": {"経理情報科2年": "マーケティング①"}, "subject": {"経理情報科2年": "マーケティング"}, "teachers": ["D"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科2年": ["D"]}, "roomBy": {"経理情報科2年": "本館3階"}, "allRooms": ["本館3階"]}, {"id": 59, "classes": ["経理情報科3年"], "label": {"経理情報科3年": "ワープロ"}, "subject": {"経理情報科3年": "ワープロ"}, "teachers": ["C"], "rooms": ["パソコン教室"], "fixed": false, "teachersBy": {"経理情報科3年": ["C"]}, "roomBy": {"経理情報科3年": "パソコン教室"}, "allRooms": ["パソコン教室"]}, {"id": 60, "classes": ["福祉科1年"], "label": {"福祉科1年": "公共"}, "subject": {"福祉科1年": "公共"}, "teachers": ["H"], "rooms": [], "fixed": false, "teachersBy": {"福祉科1年": ["H"]}, "roomBy": {"福祉科1年": "本館2階奥"}, "allRooms": ["本館2階奥"]}, {"id": 61, "classes": ["福祉科2年"], "label": {"福祉科2年": "調理"}, "subject": {"福祉科2年": "調理"}, "teachers": ["O"], "rooms": [], "fixed": true, "teachersBy": {"福祉科2年": ["O"]}, "roomBy": {"福祉科2年": "本館2階"}, "allRooms": ["本館2階"]}, {"id": 62, "classes": ["福祉科3年"], "label": {"福祉科3年": "介護実技"}, "subject": {"福祉科3年": "介護実技"}, "teachers": ["M"], "rooms": ["介護実習室"], "fixed": false, "teachersBy": {"福祉科3年": ["M"]}, "roomBy": {"福祉科3年": "介護実習室"}, "allRooms": ["介護実習室"]}, {"id": 63, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻"], "label": {"高等科1年ファッション専攻": "体育", "高等科1年きもの専攻": "体育"}, "subject": {"高等科1年ファッション専攻": "体育", "高等科1年きもの専攻": "体育"}, "teachers": ["F"], "rooms": [], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["F"], "高等科1年きもの専攻": ["F"]}, "roomBy": {"高等科1年ファッション専攻": "", "高等科1年きもの専攻": ""}, "allRooms": []}, {"id": 64, "classes": ["高等科2年ファッション専攻", "高等科2年きもの専攻", "高等科3年ファッション専攻", "高等科3年きもの専攻"], "label": {"高等科2年ファッション専攻": "洋裁(講義)", "高等科2年きもの専攻": "和裁", "高等科3年ファッション専攻": "洋裁", "高等科3年きもの専攻": "和裁"}, "subject": {"高等科2年ファッション専攻": "洋裁", "高等科2年きもの専攻": "和裁", "高等科3年ファッション専攻": "洋裁", "高等科3年きもの専攻": "和裁"}, "teachers": ["A", "B", "D"], "rooms": ["和裁教室"], "fixed": false, "teachersBy": {"高等科2年ファッション専攻": ["D"], "高等科2年きもの専攻": ["A"], "高等科3年ファッション専攻": ["B"], "高等科3年きもの専攻": ["A"]}, "roomBy": {"高等科2年ファッション専攻": "学生会館1階", "高等科2年きもの専攻": "和裁教室", "高等科3年ファッション専攻": "学生会館2階", "高等科3年きもの専攻": "和裁教室"}, "allRooms": ["和裁教室", "学生会館1階", "学生会館2階"]}, {"id": 65, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "簿記"}, "subject": {"経理情報科1年": "簿記"}, "teachers": ["I"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科1年": ["I"]}, "roomBy": {"経理情報科1年": "本館3階奥"}, "allRooms": ["本館3階奥"]}, {"id": 66, "classes": ["経理情報科2年"], "label": {"経理情報科2年": "商品と流通①"}, "subject": {"経理情報科2年": "商品と流通"}, "teachers": ["H"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科2年": ["H"]}, "roomBy": {"経理情報科2年": "本館3階"}, "allRooms": ["本館3階"]}, {"id": 67, "classes": ["経理情報科3年"], "label": {"経理情報科3年": "ワープロ"}, "subject": {"経理情報科3年": "ワープロ"}, "teachers": ["C"], "rooms": ["パソコン教室"], "fixed": false, "teachersBy": {"経理情報科3年": ["C"]}, "roomBy": {"経理情報科3年": "パソコン教室"}, "allRooms": ["パソコン教室"]}, {"id": 68, "classes": ["福祉科1年"], "label": {"福祉科1年": "ワープロ①"}, "subject": {"福祉科1年": "ワープロ"}, "teachers": ["E"], "rooms": [], "fixed": false, "teachersBy": {"福祉科1年": ["E"]}, "roomBy": {"福祉科1年": "多目的棟"}, "allRooms": ["多目的棟"]}, {"id": 69, "classes": ["福祉科2年"], "label": {"福祉科2年": "調理"}, "subject": {"福祉科2年": "調理"}, "teachers": ["O"], "rooms": [], "fixed": true, "teachersBy": {"福祉科2年": ["O"]}, "roomBy": {"福祉科2年": "本館2階"}, "allRooms": ["本館2階"]}, {"id": 70, "classes": ["福祉科3年"], "label": {"福祉科3年": "介護実技"}, "subject": {"福祉科3年": "介護実技"}, "teachers": ["M"], "rooms": ["介護実習室"], "fixed": false, "teachersBy": {"福祉科3年": ["M"]}, "roomBy": {"福祉科3年": "介護実習室"}, "allRooms": ["介護実習室"]}, {"id": 71, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻", "高等科2年ファッション専攻", "高等科2年きもの専攻", "高等科3年ファッション専攻", "高等科3年きもの専攻"], "label": {"高等科1年ファッション専攻": "洋裁", "高等科1年きもの専攻": "和裁", "高等科2年ファッション専攻": "スタイル画", "高等科2年きもの専攻": "和裁", "高等科3年ファッション専攻": "スタイル画", "高等科3年きもの専攻": "和裁"}, "subject": {"高等科1年ファッション専攻": "洋裁", "高等科1年きもの専攻": "和裁", "高等科2年ファッション専攻": "スタイル画", "高等科2年きもの専攻": "和裁", "高等科3年ファッション専攻": "スタイル画", "高等科3年きもの専攻": "和裁"}, "teachers": ["A", "B", "J"], "rooms": ["和裁教室"], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["B"], "高等科1年きもの専攻": ["A"], "高等科2年ファッション専攻": ["J"], "高等科2年きもの専攻": ["A"], "高等科3年ファッション専攻": ["J"], "高等科3年きもの専攻": ["A"]}, "roomBy": {"高等科1年ファッション専攻": "学生会館2階", "高等科1年きもの専攻": "和裁教室", "高等科2年ファッション専攻": "学生会館3階", "高等科2年きもの専攻": "和裁教室", "高等科3年ファッション専攻": "学生会館3階", "高等科3年きもの専攻": "和裁教室"}, "allRooms": ["和裁教室", "学生会館2階", "学生会館3階"]}, {"id": 72, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "簿記③"}, "subject": {"経理情報科1年": "簿記"}, "teachers": ["I"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科1年": ["I"]}, "roomBy": {"経理情報科1年": "本館3階奥"}, "allRooms": ["本館3階奥"]}, {"id": 73, "classes": ["経理情報科2年"], "label": {"経理情報科2年": "ワープロ②"}, "subject": {"経理情報科2年": "ワープロ"}, "teachers": ["C"], "rooms": ["パソコン教室"], "fixed": false, "teachersBy": {"経理情報科2年": ["C"]}, "roomBy": {"経理情報科2年": "パソコン教室"}, "allRooms": ["パソコン教室"]}, {"id": 74, "classes": ["経理情報科3年"], "label": {"経理情報科3年": "政治経済"}, "subject": {"経理情報科3年": "政治経済"}, "teachers": ["D"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科3年": ["D"]}, "roomBy": {"経理情報科3年": "本館3階"}, "allRooms": ["本館3階"]}, {"id": 75, "classes": ["福祉科1年"], "label": {"福祉科1年": "保健体育②"}, "subject": {"福祉科1年": "保健体育"}, "teachers": ["F"], "rooms": [], "fixed": false, "teachersBy": {"福祉科1年": ["F"]}, "roomBy": {"福祉科1年": "本館2階奥"}, "allRooms": ["本館2階奥"]}, {"id": 76, "classes": ["福祉科2年"], "label": {"福祉科2年": "ワープロ"}, "subject": {"福祉科2年": "ワープロ"}, "teachers": ["E"], "rooms": [], "fixed": false, "teachersBy": {"福祉科2年": ["E"]}, "roomBy": {"福祉科2年": "多目的棟"}, "allRooms": ["多目的棟"]}, {"id": 77, "classes": ["福祉科3年"], "label": {"福祉科3年": "初任者研修"}, "subject": {"福祉科3年": "初任者研修"}, "teachers": ["M"], "rooms": [], "fixed": false, "teachersBy": {"福祉科3年": ["M"]}, "roomBy": {"福祉科3年": "学生会館1階"}, "allRooms": ["学生会館1階"]}, {"id": 78, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻", "高等科2年ファッション専攻", "高等科2年きもの専攻", "高等科3年ファッション専攻", "高等科3年きもの専攻"], "label": {"高等科1年ファッション専攻": "洋裁", "高等科1年きもの専攻": "和裁", "高等科2年ファッション専攻": "ファッションデザイン", "高等科2年きもの専攻": "和裁", "高等科3年ファッション専攻": "ファッションデザイン", "高等科3年きもの専攻": "和裁"}, "subject": {"高等科1年ファッション専攻": "洋裁", "高等科1年きもの専攻": "和裁", "高等科2年ファッション専攻": "ファッションデザイン", "高等科2年きもの専攻": "和裁", "高等科3年ファッション専攻": "ファッションデザイン", "高等科3年きもの専攻": "和裁"}, "teachers": ["A", "B", "D"], "rooms": ["和裁教室"], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["B"], "高等科1年きもの専攻": ["A"], "高等科2年ファッション専攻": ["D"], "高等科2年きもの専攻": ["A"], "高等科3年ファッション専攻": ["D"], "高等科3年きもの専攻": ["A"]}, "roomBy": {"高等科1年ファッション専攻": "学生会館2階", "高等科1年きもの専攻": "和裁教室", "高等科2年ファッション専攻": "学生会館3階", "高等科2年きもの専攻": "和裁教室", "高等科3年ファッション専攻": "学生会館3階", "高等科3年きもの専攻": "和裁教室"}, "allRooms": ["和裁教室", "学生会館2階", "学生会館3階"]}, {"id": 79, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "情報処理"}, "subject": {"経理情報科1年": "情報処理"}, "teachers": ["I"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科1年": ["I"]}, "roomBy": {"経理情報科1年": "本館3階奥"}, "allRooms": ["本館3階奥"]}, {"id": 80, "classes": ["経理情報科2年"], "label": {"経理情報科2年": "ワープロ"}, "subject": {"経理情報科2年": "ワープロ"}, "teachers": ["C"], "rooms": ["パソコン教室"], "fixed": false, "teachersBy": {"経理情報科2年": ["C"]}, "roomBy": {"経理情報科2年": "パソコン教室"}, "allRooms": ["パソコン教室"]}, {"id": 81, "classes": ["経理情報科3年"], "label": {"経理情報科3年": "体育"}, "subject": {"経理情報科3年": "体育"}, "teachers": ["F"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科3年": ["F"]}, "roomBy": {"経理情報科3年": ""}, "allRooms": []}, {"id": 82, "classes": ["福祉科1年"], "label": {"福祉科1年": "ワープロ"}, "subject": {"福祉科1年": "ワープロ"}, "teachers": ["E"], "rooms": [], "fixed": false, "teachersBy": {"福祉科1年": ["E"]}, "roomBy": {"福祉科1年": "多目的棟"}, "allRooms": ["多目的棟"]}, {"id": 83, "classes": ["福祉科2年"], "label": {"福祉科2年": "保育"}, "subject": {"福祉科2年": "保育"}, "teachers": ["L"], "rooms": [], "fixed": true, "teachersBy": {"福祉科2年": ["L"]}, "roomBy": {"福祉科2年": "本館2階"}, "allRooms": ["本館2階"]}, {"id": 84, "classes": ["福祉科3年"], "label": {"福祉科3年": "家庭総合"}, "subject": {"福祉科3年": "家庭総合"}, "teachers": ["J"], "rooms": [], "fixed": false, "teachersBy": {"福祉科3年": ["J"]}, "roomBy": {"福祉科3年": "学生会館1階"}, "allRooms": ["学生会館1階"]}, {"id": 85, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻", "福祉科1年"], "label": {"高等科1年ファッション専攻": "国語", "高等科1年きもの専攻": "国語", "福祉科1年": "国語"}, "subject": {"高等科1年ファッション専攻": "国語", "高等科1年きもの専攻": "国語", "福祉科1年": "国語"}, "teachers": ["E"], "rooms": [], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["E"], "高等科1年きもの専攻": ["E"], "福祉科1年": ["E"]}, "roomBy": {"高等科1年ファッション専攻": "本館2階中央", "高等科1年きもの専攻": "本館2階中央", "福祉科1年": "本館2階奥"}, "allRooms": ["本館2階中央", "本館2階奥"]}, {"id": 86, "classes": ["高等科2年ファッション専攻", "高等科2年きもの専攻", "高等科3年ファッション専攻", "高等科3年きもの専攻"], "label": {"高等科2年ファッション専攻": "洋裁", "高等科2年きもの専攻": "和裁", "高等科3年ファッション専攻": "ワープロ", "高等科3年きもの専攻": "和裁"}, "subject": {"高等科2年ファッション専攻": "洋裁", "高等科2年きもの専攻": "和裁", "高等科3年ファッション専攻": "ワープロ", "高等科3年きもの専攻": "和裁"}, "teachers": ["A", "B", "D"], "rooms": ["パソコン教室", "和裁教室"], "fixed": false, "teachersBy": {"高等科2年ファッション専攻": ["B"], "高等科2年きもの専攻": ["A"], "高等科3年ファッション専攻": ["D"], "高等科3年きもの専攻": ["A"]}, "roomBy": {"高等科2年ファッション専攻": "学生会館2階", "高等科2年きもの専攻": "和裁教室", "高等科3年ファッション専攻": "パソコン教室", "高等科3年きもの専攻": "和裁教室"}, "allRooms": ["パソコン教室", "和裁教室", "学生会館2階"]}, {"id": 87, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "数学"}, "subject": {"経理情報科1年": "数学"}, "teachers": ["C"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科1年": ["C"]}, "roomBy": {"経理情報科1年": "本館3階奥"}, "allRooms": ["本館3階奥"]}, {"id": 88, "classes": ["経理情報科2年"], "label": {"経理情報科2年": "商品と流通②"}, "subject": {"経理情報科2年": "商品と流通"}, "teachers": ["H"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科2年": ["H"]}, "roomBy": {"経理情報科2年": "学生会館3階"}, "allRooms": ["学生会館3階"]}, {"id": 89, "classes": ["経理情報科3年"], "label": {"経理情報科3年": "電卓"}, "subject": {"経理情報科3年": "電卓"}, "teachers": ["I"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科3年": ["I"]}, "roomBy": {"経理情報科3年": "本館3階"}, "allRooms": ["本館3階"]}, {"id": 90, "classes": ["福祉科2年"], "label": {"福祉科2年": "保育"}, "subject": {"福祉科2年": "保育"}, "teachers": ["L"], "rooms": [], "fixed": true, "teachersBy": {"福祉科2年": ["L"]}, "roomBy": {"福祉科2年": "本館2階"}, "allRooms": ["本館2階"]}, {"id": 91, "classes": ["福祉科3年"], "label": {"福祉科3年": "体育"}, "subject": {"福祉科3年": "体育"}, "teachers": ["F"], "rooms": [], "fixed": false, "teachersBy": {"福祉科3年": ["F"]}, "roomBy": {"福祉科3年": "学生会館3階"}, "allRooms": ["学生会館3階"]}, {"id": 92, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻"], "label": {"高等科1年ファッション専攻": "ワープロ", "高等科1年きもの専攻": "ワープロ"}, "subject": {"高等科1年ファッション専攻": "ワープロ", "高等科1年きもの専攻": "ワープロ"}, "teachers": ["C"], "rooms": ["パソコン教室"], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["C"], "高等科1年きもの専攻": ["C"]}, "roomBy": {"高等科1年ファッション専攻": "パソコン教室", "高等科1年きもの専攻": "パソコン教室"}, "allRooms": ["パソコン教室"]}, {"id": 93, "classes": ["高等科2年ファッション専攻", "高等科2年きもの専攻"], "label": {"高等科2年ファッション専攻": "洋裁", "高等科2年きもの専攻": "和裁"}, "subject": {"高等科2年ファッション専攻": "洋裁", "高等科2年きもの専攻": "和裁"}, "teachers": ["A", "B"], "rooms": ["和裁教室"], "fixed": false, "teachersBy": {"高等科2年ファッション専攻": ["B"], "高等科2年きもの専攻": ["A"]}, "roomBy": {"高等科2年ファッション専攻": "学生会館2階", "高等科2年きもの専攻": "和裁教室"}, "allRooms": ["和裁教室", "学生会館2階"]}, {"id": 94, "classes": ["高等科3年ファッション専攻", "高等科3年きもの専攻", "経理情報科3年", "福祉科3年"], "label": {"高等科3年ファッション専攻": "世界史", "高等科3年きもの専攻": "世界史", "経理情報科3年": "世界史", "福祉科3年": "世界史"}, "subject": {"高等科3年ファッション専攻": "世界史", "高等科3年きもの専攻": "世界史", "経理情報科3年": "世界史", "福祉科3年": "世界史"}, "teachers": ["E"], "rooms": [], "fixed": false, "teachersBy": {"高等科3年ファッション専攻": ["E"], "高等科3年きもの専攻": ["E"], "経理情報科3年": ["E"], "福祉科3年": ["E"]}, "roomBy": {"高等科3年ファッション専攻": "本館2階", "高等科3年きもの専攻": "本館2階", "経理情報科3年": "本館2階", "福祉科3年": "本館2階"}, "allRooms": ["本館2階"]}, {"id": 95, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "時事問題②"}, "subject": {"経理情報科1年": "時事問題"}, "teachers": ["D"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科1年": ["D"]}, "roomBy": {"経理情報科1年": "本館3階奥"}, "allRooms": ["本館3階奥"]}, {"id": 96, "classes": ["経理情報科2年"], "label": {"経理情報科2年": "電卓"}, "subject": {"経理情報科2年": "電卓"}, "teachers": ["I"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科2年": ["I"]}, "roomBy": {"経理情報科2年": "本館3階"}, "allRooms": ["本館3階"]}, {"id": 97, "classes": ["福祉科1年"], "label": {"福祉科1年": "体育"}, "subject": {"福祉科1年": "体育"}, "teachers": ["F"], "rooms": [], "fixed": false, "teachersBy": {"福祉科1年": ["F"]}, "roomBy": {"福祉科1年": ""}, "allRooms": []}, {"id": 98, "classes": ["福祉科2年"], "label": {"福祉科2年": "初任者研修"}, "subject": {"福祉科2年": "初任者研修"}, "teachers": ["K"], "rooms": [], "fixed": true, "teachersBy": {"福祉科2年": ["K"]}, "roomBy": {"福祉科2年": "学生会館3階"}, "allRooms": ["学生会館3階"]}, {"id": 99, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻"], "label": {"高等科1年ファッション専攻": "簿記", "高等科1年きもの専攻": "簿記"}, "subject": {"高等科1年ファッション専攻": "簿記", "高等科1年きもの専攻": "簿記"}, "teachers": ["I"], "rooms": [], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["I"], "高等科1年きもの専攻": ["I"]}, "roomBy": {"高等科1年ファッション専攻": "本館3階奥", "高等科1年きもの専攻": "本館3階奥"}, "allRooms": ["本館3階奥"]}, {"id": 100, "classes": ["高等科2年ファッション専攻", "高等科2年きもの専攻"], "label": {"高等科2年ファッション専攻": "洋裁", "高等科2年きもの専攻": "和裁"}, "subject": {"高等科2年ファッション専攻": "洋裁", "高等科2年きもの専攻": "和裁"}, "teachers": ["A", "B"], "rooms": ["和裁教室"], "fixed": false, "teachersBy": {"高等科2年ファッション専攻": ["B"], "高等科2年きもの専攻": ["A"]}, "roomBy": {"高等科2年ファッション専攻": "学生会館2階", "高等科2年きもの専攻": "和裁教室"}, "allRooms": ["和裁教室", "学生会館2階"]}, {"id": 101, "classes": ["高等科3年ファッション専攻", "高等科3年きもの専攻", "経理情報科3年", "福祉科3年"], "label": {"高等科3年ファッション専攻": "漢字検定", "高等科3年きもの専攻": "漢字検定", "経理情報科3年": "漢字検定", "福祉科3年": "漢字検定"}, "subject": {"高等科3年ファッション専攻": "漢字検定", "高等科3年きもの専攻": "漢字検定", "経理情報科3年": "漢字検定", "福祉科3年": "漢字検定"}, "teachers": ["C"], "rooms": [], "fixed": false, "teachersBy": {"高等科3年ファッション専攻": ["C"], "高等科3年きもの専攻": ["C"], "経理情報科3年": ["C"], "福祉科3年": ["C"]}, "roomBy": {"高等科3年ファッション専攻": "本館2階", "高等科3年きもの専攻": "本館2階", "経理情報科3年": "本館2階", "福祉科3年": "本館2階"}, "allRooms": ["本館2階"]}, {"id": 102, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "ワープロ①"}, "subject": {"経理情報科1年": "ワープロ"}, "teachers": ["E"], "rooms": ["パソコン教室"], "fixed": false, "teachersBy": {"経理情報科1年": ["E"]}, "roomBy": {"経理情報科1年": "パソコン教室"}, "allRooms": ["パソコン教室"]}, {"id": 103, "classes": ["経理情報科2年"], "label": {"経理情報科2年": "マーケティング②"}, "subject": {"経理情報科2年": "マーケティング"}, "teachers": ["D"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科2年": ["D"]}, "roomBy": {"経理情報科2年": "本館3階"}, "allRooms": ["本館3階"]}, {"id": 104, "classes": ["福祉科1年"], "label": {"福祉科1年": "体育"}, "subject": {"福祉科1年": "体育"}, "teachers": ["F"], "rooms": [], "fixed": false, "teachersBy": {"福祉科1年": ["F"]}, "roomBy": {"福祉科1年": ""}, "allRooms": []}, {"id": 105, "classes": ["福祉科2年"], "label": {"福祉科2年": "初任者研修"}, "subject": {"福祉科2年": "初任者研修"}, "teachers": ["K"], "rooms": [], "fixed": true, "teachersBy": {"福祉科2年": ["K"]}, "roomBy": {"福祉科2年": "学生会館3階"}, "allRooms": ["学生会館3階"]}, {"id": 106, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻"], "label": {"高等科1年ファッション専攻": "洋裁", "高等科1年きもの専攻": "和裁"}, "subject": {"高等科1年ファッション専攻": "洋裁", "高等科1年きもの専攻": "和裁"}, "teachers": ["A", "B"], "rooms": ["和裁教室"], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["B"], "高等科1年きもの専攻": ["A"]}, "roomBy": {"高等科1年ファッション専攻": "学生会館2階", "高等科1年きもの専攻": "和裁教室"}, "allRooms": ["和裁教室", "学生会館2階"]}, {"id": 107, "classes": ["高等科2年ファッション専攻", "高等科2年きもの専攻", "経理情報科2年", "福祉科2年"], "label": {"高等科2年ファッション専攻": "国語", "高等科2年きもの専攻": "国語", "経理情報科2年": "国語", "福祉科2年": "国語"}, "subject": {"高等科2年ファッション専攻": "国語", "高等科2年きもの専攻": "国語", "経理情報科2年": "国語", "福祉科2年": "国語"}, "teachers": ["C"], "rooms": [], "fixed": false, "teachersBy": {"高等科2年ファッション専攻": ["C"], "高等科2年きもの専攻": ["C"], "経理情報科2年": ["C"], "福祉科2年": ["C"]}, "roomBy": {"高等科2年ファッション専攻": "本館2階", "高等科2年きもの専攻": "本館2階", "経理情報科2年": "本館2階", "福祉科2年": "本館2階"}, "allRooms": ["本館2階"]}, {"id": 108, "classes": ["高等科3年ファッション専攻", "高等科3年きもの専攻"], "label": {"高等科3年ファッション専攻": "簿記", "高等科3年きもの専攻": "簿記"}, "subject": {"高等科3年ファッション専攻": "簿記", "高等科3年きもの専攻": "簿記"}, "teachers": ["G"], "rooms": [], "fixed": false, "teachersBy": {"高等科3年ファッション専攻": ["G"], "高等科3年きもの専攻": ["G"]}, "roomBy": {"高等科3年ファッション専攻": "学生会館3階", "高等科3年きもの専攻": "学生会館3階"}, "allRooms": ["学生会館3階"]}, {"id": 109, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "ワープロ"}, "subject": {"経理情報科1年": "ワープロ"}, "teachers": ["E"], "rooms": ["パソコン教室"], "fixed": false, "teachersBy": {"経理情報科1年": ["E"]}, "roomBy": {"経理情報科1年": "パソコン教室"}, "allRooms": ["パソコン教室"]}, {"id": 110, "classes": ["経理情報科3年"], "label": {"経理情報科3年": "政治経済②"}, "subject": {"経理情報科3年": "政治経済"}, "teachers": ["D"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科3年": ["D"]}, "roomBy": {"経理情報科3年": "本館3階"}, "allRooms": ["本館3階"]}, {"id": 111, "classes": ["福祉科1年"], "label": {"福祉科1年": "音楽"}, "subject": {"福祉科1年": "音楽"}, "teachers": ["P"], "rooms": [], "fixed": true, "teachersBy": {"福祉科1年": ["P"]}, "roomBy": {"福祉科1年": "学生会館3階"}, "allRooms": ["学生会館3階"]}, {"id": 112, "classes": ["福祉科3年"], "label": {"福祉科3年": "初任者研修"}, "subject": {"福祉科3年": "初任者研修"}, "teachers": ["M"], "rooms": [], "fixed": false, "teachersBy": {"福祉科3年": ["M"]}, "roomBy": {"福祉科3年": "学生会館1階"}, "allRooms": ["学生会館1階"]}, {"id": 113, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻"], "label": {"高等科1年ファッション専攻": "洋裁", "高等科1年きもの専攻": "和裁"}, "subject": {"高等科1年ファッション専攻": "洋裁", "高等科1年きもの専攻": "和裁"}, "teachers": ["A", "B"], "rooms": ["和裁教室"], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["B"], "高等科1年きもの専攻": ["A"]}, "roomBy": {"高等科1年ファッション専攻": "学生会館2階", "高等科1年きもの専攻": "和裁教室"}, "allRooms": ["和裁教室", "学生会館2階"]}, {"id": 114, "classes": ["高等科2年ファッション専攻", "高等科2年きもの専攻"], "label": {"高等科2年ファッション専攻": "漢字検定", "高等科2年きもの専攻": "漢字検定"}, "subject": {"高等科2年ファッション専攻": "漢字検定", "高等科2年きもの専攻": "漢字検定"}, "teachers": ["D"], "rooms": [], "fixed": false, "teachersBy": {"高等科2年ファッション専攻": ["D"], "高等科2年きもの専攻": ["D"]}, "roomBy": {"高等科2年ファッション専攻": "学生会館1階", "高等科2年きもの専攻": "学生会館1階"}, "allRooms": ["学生会館1階"]}, {"id": 115, "classes": ["高等科3年ファッション専攻", "高等科3年きもの専攻", "経理情報科3年", "福祉科3年"], "label": {"高等科3年ファッション専攻": "英語(本館3階)", "高等科3年きもの専攻": "英語(本館3階)", "経理情報科3年": "英語(本館3階)", "福祉科3年": "英語(本館3階)"}, "subject": {"高等科3年ファッション専攻": "英語", "高等科3年きもの専攻": "英語", "経理情報科3年": "英語", "福祉科3年": "英語"}, "teachers": ["E", "F"], "rooms": [], "fixed": false, "teachersBy": {"高等科3年ファッション専攻": ["E", "F"], "高等科3年きもの専攻": ["E", "F"], "経理情報科3年": ["E", "F"], "福祉科3年": ["E", "F"]}, "roomBy": {"高等科3年ファッション専攻": "学生会館3階・本館3階", "高等科3年きもの専攻": "学生会館3階・本館3階", "経理情報科3年": "学生会館3階・本館3階", "福祉科3年": "学生会館3階・本館3階"}, "allRooms": ["学生会館3階", "本館3階"]}, {"id": 116, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "公共"}, "subject": {"経理情報科1年": "公共"}, "teachers": ["H"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科1年": ["H"]}, "roomBy": {"経理情報科1年": "本館3階奥"}, "allRooms": ["本館3階奥"]}, {"id": 117, "classes": ["経理情報科2年"], "label": {"経理情報科2年": "簿記②"}, "subject": {"経理情報科2年": "簿記"}, "teachers": ["G"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科2年": ["G"]}, "roomBy": {"経理情報科2年": "本館2階"}, "allRooms": ["本館2階"]}, {"id": 118, "classes": ["福祉科1年"], "label": {"福祉科1年": "社会福祉の基礎"}, "subject": {"福祉科1年": "社会福祉の基礎"}, "teachers": ["C"], "rooms": [], "fixed": false, "teachersBy": {"福祉科1年": ["C"]}, "roomBy": {"福祉科1年": "本館2階奥"}, "allRooms": ["本館2階奥"]}, {"id": 119, "classes": ["福祉科2年"], "label": {"福祉科2年": "音楽"}, "subject": {"福祉科2年": "音楽"}, "teachers": ["P"], "rooms": [], "fixed": true, "teachersBy": {"福祉科2年": ["P"]}, "roomBy": {"福祉科2年": "学生会館3階"}, "allRooms": ["学生会館3階"]}, {"id": 120, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻", "高等科2年ファッション専攻", "高等科2年きもの専攻", "高等科3年ファッション専攻", "高等科3年きもの専攻"], "label": {"高等科1年ファッション専攻": "洋裁", "高等科1年きもの専攻": "和裁", "高等科2年ファッション専攻": "HR", "高等科2年きもの専攻": "和裁", "高等科3年ファッション専攻": "HR", "高等科3年きもの専攻": "和裁"}, "subject": {"高等科1年ファッション専攻": "洋裁", "高等科1年きもの専攻": "和裁", "高等科2年ファッション専攻": "HR", "高等科2年きもの専攻": "和裁", "高等科3年ファッション専攻": "HR", "高等科3年きもの専攻": "和裁"}, "teachers": ["A", "B", "D"], "rooms": ["和裁教室"], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["B"], "高等科1年きもの専攻": ["A"], "高等科2年ファッション専攻": ["D"], "高等科2年きもの専攻": ["A"], "高等科3年ファッション専攻": ["D"], "高等科3年きもの専攻": ["A"]}, "roomBy": {"高等科1年ファッション専攻": "学生会館2階", "高等科1年きもの専攻": "和裁教室", "高等科2年ファッション専攻": "学生会館3階", "高等科2年きもの専攻": "和裁教室", "高等科3年ファッション専攻": "学生会館3階", "高等科3年きもの専攻": "和裁教室"}, "allRooms": ["和裁教室", "学生会館2階", "学生会館3階"]}, {"id": 121, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "国語"}, "subject": {"経理情報科1年": "国語"}, "teachers": ["E"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科1年": ["E"]}, "roomBy": {"経理情報科1年": "本館3階奥"}, "allRooms": ["本館3階奥"]}, {"id": 122, "classes": ["経理情報科2年", "福祉科2年"], "label": {"経理情報科2年": "HR", "福祉科2年": "HR"}, "subject": {"経理情報科2年": "HR", "福祉科2年": "HR"}, "teachers": ["H"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科2年": ["H"], "福祉科2年": ["H"]}, "roomBy": {"経理情報科2年": "本館2階", "福祉科2年": "本館2階"}, "allRooms": ["本館2階"]}, {"id": 123, "classes": ["経理情報科3年"], "label": {"経理情報科3年": "国語"}, "subject": {"経理情報科3年": "国語"}, "teachers": ["C"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科3年": ["C"]}, "roomBy": {"経理情報科3年": "本館3階"}, "allRooms": ["本館3階"]}, {"id": 124, "classes": ["福祉科1年"], "label": {"福祉科1年": "こころとからだの理解"}, "subject": {"福祉科1年": "こころとからだの理解"}, "teachers": ["T"], "rooms": [], "fixed": false, "teachersBy": {"福祉科1年": ["T"]}, "roomBy": {"福祉科1年": "本館2階奥"}, "allRooms": ["本館2階奥"]}, {"id": 125, "classes": ["福祉科3年"], "label": {"福祉科3年": "音楽"}, "subject": {"福祉科3年": "音楽"}, "teachers": ["P"], "rooms": [], "fixed": true, "teachersBy": {"福祉科3年": ["P"]}, "roomBy": {"福祉科3年": "学生会館3階"}, "allRooms": ["学生会館3階"]}, {"id": 126, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻", "福祉科1年"], "label": {"高等科1年ファッション専攻": "礼法", "高等科1年きもの専攻": "礼法", "福祉科1年": "礼法"}, "subject": {"高等科1年ファッション専攻": "礼法", "高等科1年きもの専攻": "礼法", "福祉科1年": "礼法"}, "teachers": ["H"], "rooms": [], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["H"], "高等科1年きもの専攻": ["H"], "福祉科1年": ["H"]}, "roomBy": {"高等科1年ファッション専攻": "本館2階中央", "高等科1年きもの専攻": "本館2階中央", "福祉科1年": "本館2階奥"}, "allRooms": ["本館2階中央", "本館2階奥"]}, {"id": 127, "classes": ["高等科2年ファッション専攻", "高等科2年きもの専攻", "高等科3年ファッション専攻", "高等科3年きもの専攻", "経理情報科2年", "経理情報科3年", "福祉科2年", "福祉科3年"], "label": {"高等科2年ファッション専攻": "選択授業:福祉 / 簿記・電卓 / 体育 / 洋裁 / パソコン / 和裁 / 小論文", "高等科2年きもの専攻": "選択授業:福祉 / 簿記・電卓 / 体育 / 洋裁 / パソコン / 和裁 / 小論文", "高等科3年ファッション専攻": "選択授業:福祉 / 簿記・電卓 / 体育 / 洋裁 / パソコン / 和裁 / 小論文", "高等科3年きもの専攻": "選択授業:福祉 / 簿記・電卓 / 体育 / 洋裁 / パソコン / 和裁 / 小論文", "経理情報科2年": "選択授業:福祉 / 簿記・電卓 / 体育 / 洋裁 / パソコン / 和裁 / 小論文", "経理情報科3年": "選択授業:福祉 / 簿記・電卓 / 体育 / 洋裁 / パソコン / 和裁 / 小論文", "福祉科2年": "選択授業:福祉 / 簿記・電卓 / 体育 / 洋裁 / パソコン / 和裁 / 小論文", "福祉科3年": "選択授業:福祉 / 簿記・電卓 / 体育 / 洋裁 / パソコン / 和裁 / 小論文"}, "subject": {"高等科2年ファッション専攻": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "高等科2年きもの専攻": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "高等科3年ファッション専攻": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "高等科3年きもの専攻": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "経理情報科2年": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "経理情報科3年": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "福祉科2年": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "福祉科3年": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉"}, "teachers": ["A", "B", "C", "D", "F", "G", "I"], "rooms": ["パソコン教室", "和裁教室"], "fixed": false, "teachersBy": {"高等科2年ファッション専攻": ["A", "B", "C", "D", "F", "G", "I"], "高等科2年きもの専攻": ["A", "B", "C", "D", "F", "G", "I"], "高等科3年ファッション専攻": ["A", "B", "C", "D", "F", "G", "I"], "高等科3年きもの専攻": ["A", "B", "C", "D", "F", "G", "I"], "経理情報科2年": ["A", "B", "C", "D", "F", "G", "I"], "経理情報科3年": ["A", "B", "C", "D", "F", "G", "I"], "福祉科2年": ["A", "B", "C", "D", "F", "G", "I"], "福祉科3年": ["A", "B", "C", "D", "F", "G", "I"]}, "roomBy": {"高等科2年ファッション専攻": "", "高等科2年きもの専攻": "", "高等科3年ファッション専攻": "", "高等科3年きもの専攻": "", "経理情報科2年": "", "経理情報科3年": "", "福祉科2年": "", "福祉科3年": ""}, "allRooms": []}, {"id": 128, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "ペン字"}, "subject": {"経理情報科1年": "ペン字"}, "teachers": ["E"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科1年": ["E"]}, "roomBy": {"経理情報科1年": "本館3階奥"}, "allRooms": ["本館3階奥"]}, {"id": 129, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻", "福祉科1年"], "label": {"高等科1年ファッション専攻": "ペン字", "高等科1年きもの専攻": "ペン字", "福祉科1年": "ペン字"}, "subject": {"高等科1年ファッション専攻": "ペン字", "高等科1年きもの専攻": "ペン字", "福祉科1年": "ペン字"}, "teachers": ["E"], "rooms": [], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["E"], "高等科1年きもの専攻": ["E"], "福祉科1年": ["E"]}, "roomBy": {"高等科1年ファッション専攻": "本館2階中央", "高等科1年きもの専攻": "本館2階中央", "福祉科1年": "本館2階奥"}, "allRooms": ["本館2階中央", "本館2階奥"]}, {"id": 130, "classes": ["高等科2年ファッション専攻", "高等科2年きもの専攻", "高等科3年ファッション専攻", "高等科3年きもの専攻", "経理情報科2年", "経理情報科3年", "福祉科2年", "福祉科3年"], "label": {"高等科2年ファッション専攻": "選択授業:福祉 / 簿記・電卓 / 体育 / 洋裁 / パソコン / 和裁 / 小論文", "高等科2年きもの専攻": "選択授業:福祉 / 簿記・電卓 / 体育 / 洋裁 / パソコン / 和裁 / 小論文", "高等科3年ファッション専攻": "選択授業:福祉 / 簿記・電卓 / 体育 / 洋裁 / パソコン / 和裁 / 小論文", "高等科3年きもの専攻": "選択授業:福祉 / 簿記・電卓 / 体育 / 洋裁 / パソコン / 和裁 / 小論文", "経理情報科2年": "選択授業:福祉 / 簿記・電卓 / 体育 / 洋裁 / パソコン / 和裁 / 小論文", "経理情報科3年": "選択授業:福祉 / 簿記・電卓 / 体育 / 洋裁 / パソコン / 和裁 / 小論文", "福祉科2年": "選択授業:福祉 / 簿記・電卓 / 体育 / 洋裁 / パソコン / 和裁 / 小論文", "福祉科3年": "選択授業:福祉 / 簿記・電卓 / 体育 / 洋裁 / パソコン / 和裁 / 小論文"}, "subject": {"高等科2年ファッション専攻": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "高等科2年きもの専攻": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "高等科3年ファッション専攻": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "高等科3年きもの専攻": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "経理情報科2年": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "経理情報科3年": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "福祉科2年": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "福祉科3年": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉"}, "teachers": ["A", "B", "C", "D", "F", "G", "I"], "rooms": ["パソコン教室", "和裁教室"], "fixed": false, "teachersBy": {"高等科2年ファッション専攻": ["A", "B", "C", "D", "F", "G", "I"], "高等科2年きもの専攻": ["A", "B", "C", "D", "F", "G", "I"], "高等科3年ファッション専攻": ["A", "B", "C", "D", "F", "G", "I"], "高等科3年きもの専攻": ["A", "B", "C", "D", "F", "G", "I"], "経理情報科2年": ["A", "B", "C", "D", "F", "G", "I"], "経理情報科3年": ["A", "B", "C", "D", "F", "G", "I"], "福祉科2年": ["A", "B", "C", "D", "F", "G", "I"], "福祉科3年": ["A", "B", "C", "D", "F", "G", "I"]}, "roomBy": {"高等科2年ファッション専攻": "", "高等科2年きもの専攻": "", "高等科3年ファッション専攻": "", "高等科3年きもの専攻": "", "経理情報科2年": "", "経理情報科3年": "", "福祉科2年": "", "福祉科3年": ""}, "allRooms": []}, {"id": 131, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "礼法"}, "subject": {"経理情報科1年": "礼法"}, "teachers": ["H"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科1年": ["H"]}, "roomBy": {"経理情報科1年": "本館3階奥"}, "allRooms": ["本館3階奥"]}, {"id": 132, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻", "福祉科1年"], "label": {"高等科1年ファッション専攻": "電卓", "高等科1年きもの専攻": "電卓", "福祉科1年": "電卓"}, "subject": {"高等科1年ファッション専攻": "電卓", "高等科1年きもの専攻": "電卓", "福祉科1年": "電卓"}, "teachers": ["G"], "rooms": [], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["G"], "高等科1年きもの専攻": ["G"], "福祉科1年": ["G"]}, "roomBy": {"高等科1年ファッション専攻": "本館3階", "高等科1年きもの専攻": "本館3階", "福祉科1年": "本館3階"}, "allRooms": ["本館3階"]}, {"id": 133, "classes": ["高等科2年ファッション専攻", "高等科2年きもの専攻"], "label": {"高等科2年ファッション専攻": "洋裁(学生2階)", "高等科2年きもの専攻": "和裁(和裁教室)"}, "subject": {"高等科2年ファッション専攻": "洋裁", "高等科2年きもの専攻": "和裁"}, "teachers": ["A", "B"], "rooms": ["和裁教室"], "fixed": false, "teachersBy": {"高等科2年ファッション専攻": ["B"], "高等科2年きもの専攻": ["A"]}, "roomBy": {"高等科2年ファッション専攻": "学生会館2階", "高等科2年きもの専攻": "和裁教室"}, "allRooms": ["和裁教室", "学生会館2階"]}, {"id": 134, "classes": ["高等科3年ファッション専攻", "高等科3年きもの専攻", "経理情報科3年", "福祉科3年"], "label": {"高等科3年ファッション専攻": "美術", "高等科3年きもの専攻": "美術", "経理情報科3年": "美術", "福祉科3年": "美術"}, "subject": {"高等科3年ファッション専攻": "美術", "高等科3年きもの専攻": "美術", "経理情報科3年": "美術", "福祉科3年": "美術"}, "teachers": ["J"], "rooms": [], "fixed": false, "teachersBy": {"高等科3年ファッション専攻": ["J"], "高等科3年きもの専攻": ["J"], "経理情報科3年": ["J"], "福祉科3年": ["J"]}, "roomBy": {"高等科3年ファッション専攻": "本館2階", "高等科3年きもの専攻": "本館2階", "経理情報科3年": "本館2階", "福祉科3年": "本館2階"}, "allRooms": ["本館2階"]}, {"id": 135, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "ワープロ"}, "subject": {"経理情報科1年": "ワープロ"}, "teachers": ["E"], "rooms": ["パソコン教室"], "fixed": false, "teachersBy": {"経理情報科1年": ["E"]}, "roomBy": {"経理情報科1年": "パソコン教室"}, "allRooms": ["パソコン教室"]}, {"id": 136, "classes": ["経理情報科2年", "福祉科2年"], "label": {"経理情報科2年": "漢字検定", "福祉科2年": "漢字検定"}, "subject": {"経理情報科2年": "漢字検定", "福祉科2年": "漢字検定"}, "teachers": ["C"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科2年": ["C"], "福祉科2年": ["C"]}, "roomBy": {"経理情報科2年": "本館3階奥", "福祉科2年": "本館2階奥"}, "allRooms": ["本館2階奥", "本館3階奥"]}, {"id": 137, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻", "福祉科1年"], "label": {"高等科1年ファッション専攻": "美術", "高等科1年きもの専攻": "美術", "福祉科1年": "美術"}, "subject": {"高等科1年ファッション専攻": "美術", "高等科1年きもの専攻": "美術", "福祉科1年": "美術"}, "teachers": ["N"], "rooms": [], "fixed": true, "teachersBy": {"高等科1年ファッション専攻": ["N"], "高等科1年きもの専攻": ["N"], "福祉科1年": ["N"]}, "roomBy": {"高等科1年ファッション専攻": "本館2階中央", "高等科1年きもの専攻": "本館2階中央", "福祉科1年": "本館2階奥"}, "allRooms": ["本館2階中央", "本館2階奥"]}, {"id": 138, "classes": ["高等科2年ファッション専攻", "高等科2年きもの専攻", "高等科3年ファッション専攻", "高等科3年きもの専攻", "福祉科3年"], "label": {"高等科2年ファッション専攻": "洋裁(学生2階)", "高等科2年きもの専攻": "和裁(和裁教室)", "高等科3年ファッション専攻": "電卓(学生3F)", "高等科3年きもの専攻": "和裁(和裁教室)", "福祉科3年": "電卓(学生3F) / 和裁(和裁教室)"}, "subject": {"高等科2年ファッション専攻": "洋裁", "高等科2年きもの専攻": "和裁", "高等科3年ファッション専攻": "電卓", "高等科3年きもの専攻": "和裁", "福祉科3年": "和裁・電卓"}, "teachers": ["A", "B", "C"], "rooms": ["和裁教室"], "fixed": false, "teachersBy": {"高等科2年ファッション専攻": ["B"], "高等科2年きもの専攻": ["A"], "高等科3年ファッション専攻": ["C"], "高等科3年きもの専攻": ["A"], "福祉科3年": ["A", "C"]}, "roomBy": {"高等科2年ファッション専攻": "学生会館2階", "高等科2年きもの専攻": "和裁教室", "高等科3年ファッション専攻": "学生会館3階", "高等科3年きもの専攻": "和裁教室", "福祉科3年": "学生会館3階・和裁教室"}, "allRooms": ["和裁教室", "学生会館2階", "学生会館3階"]}, {"id": 139, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "英語"}, "subject": {"経理情報科1年": "英語"}, "teachers": ["E"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科1年": ["E"]}, "roomBy": {"経理情報科1年": "本館3階奥"}, "allRooms": ["本館3階奥"]}, {"id": 140, "classes": ["経理情報科2年"], "label": {"経理情報科2年": "簿記③"}, "subject": {"経理情報科2年": "簿記"}, "teachers": ["G"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科2年": ["G"]}, "roomBy": {"経理情報科2年": "本館3階"}, "allRooms": ["本館3階"]}, {"id": 141, "classes": ["経理情報科3年"], "label": {"経理情報科3年": "表計算"}, "subject": {"経理情報科3年": "表計算"}, "teachers": ["F"], "rooms": ["パソコン教室"], "fixed": false, "teachersBy": {"経理情報科3年": ["F"]}, "roomBy": {"経理情報科3年": "パソコン教室"}, "allRooms": ["パソコン教室"]}, {"id": 142, "classes": ["福祉科2年"], "label": {"福祉科2年": "レクリエーション"}, "subject": {"福祉科2年": "レクリエーション"}, "teachers": ["H"], "rooms": [], "fixed": false, "teachersBy": {"福祉科2年": ["H"]}, "roomBy": {"福祉科2年": "本館2階"}, "allRooms": ["本館2階"]}, {"id": 143, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻"], "label": {"高等科1年ファッション専攻": "英語", "高等科1年きもの専攻": "英語"}, "subject": {"高等科1年ファッション専攻": "英語", "高等科1年きもの専攻": "英語"}, "teachers": ["E"], "rooms": [], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["E"], "高等科1年きもの専攻": ["E"]}, "roomBy": {"高等科1年ファッション専攻": "学生会館1階", "高等科1年きもの専攻": "学生会館1階"}, "allRooms": ["学生会館1階"]}, {"id": 144, "classes": ["高等科2年ファッション専攻", "高等科2年きもの専攻", "高等科3年ファッション専攻", "高等科3年きもの専攻", "福祉科3年"], "label": {"高等科2年ファッション専攻": "洋裁(学生2階)", "高等科2年きもの専攻": "和裁(和裁教室)", "高等科3年ファッション専攻": "社会人常識マナー(学生3F)", "高等科3年きもの専攻": "和裁(和裁教室)", "福祉科3年": "社会人常識マナー(学生3F)"}, "subject": {"高等科2年ファッション専攻": "洋裁", "高等科2年きもの専攻": "和裁", "高等科3年ファッション専攻": "社会人常識マナー", "高等科3年きもの専攻": "和裁", "福祉科3年": "社会人常識マナー"}, "teachers": ["A", "B", "D"], "rooms": ["和裁教室"], "fixed": false, "teachersBy": {"高等科2年ファッション専攻": ["B"], "高等科2年きもの専攻": ["A"], "高等科3年ファッション専攻": ["D"], "高等科3年きもの専攻": ["A"], "福祉科3年": ["D"]}, "roomBy": {"高等科2年ファッション専攻": "学生会館2階", "高等科2年きもの専攻": "和裁教室", "高等科3年ファッション専攻": "学生会館3階", "高等科3年きもの専攻": "和裁教室", "福祉科3年": "学生会館3階"}, "allRooms": ["和裁教室", "学生会館2階", "学生会館3階"]}, {"id": 145, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "美術"}, "subject": {"経理情報科1年": "美術"}, "teachers": ["N"], "rooms": [], "fixed": true, "teachersBy": {"経理情報科1年": ["N"]}, "roomBy": {"経理情報科1年": "本館3階奥"}, "allRooms": ["本館3階奥"]}, {"id": 146, "classes": ["経理情報科2年"], "label": {"経理情報科2年": "簿記④"}, "subject": {"経理情報科2年": "簿記"}, "teachers": ["G"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科2年": ["G"]}, "roomBy": {"経理情報科2年": "本館3階"}, "allRooms": ["本館3階"]}, {"id": 147, "classes": ["経理情報科3年"], "label": {"経理情報科3年": "表計算"}, "subject": {"経理情報科3年": "表計算"}, "teachers": ["F"], "rooms": ["パソコン教室"], "fixed": false, "teachersBy": {"経理情報科3年": ["F"]}, "roomBy": {"経理情報科3年": "パソコン教室"}, "allRooms": ["パソコン教室"]}, {"id": 148, "classes": ["福祉科1年"], "label": {"福祉科1年": "漢字検定"}, "subject": {"福祉科1年": "漢字検定"}, "teachers": ["C"], "rooms": [], "fixed": false, "teachersBy": {"福祉科1年": ["C"]}, "roomBy": {"福祉科1年": "本館2階奥"}, "allRooms": ["本館2階奥"]}, {"id": 149, "classes": ["福祉科2年"], "label": {"福祉科2年": "レクリエーション"}, "subject": {"福祉科2年": "レクリエーション"}, "teachers": ["H"], "rooms": [], "fixed": false, "teachersBy": {"福祉科2年": ["H"]}, "roomBy": {"福祉科2年": "本館2階"}, "allRooms": ["本館2階"]}, {"id": 150, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻"], "label": {"高等科1年ファッション専攻": "数学", "高等科1年きもの専攻": "数学"}, "subject": {"高等科1年ファッション専攻": "数学", "高等科1年きもの専攻": "数学"}, "teachers": ["C"], "rooms": [], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["C"], "高等科1年きもの専攻": ["C"]}, "roomBy": {"高等科1年ファッション専攻": "学生会館1階", "高等科1年きもの専攻": "学生会館1階"}, "allRooms": ["学生会館1階"]}, {"id": 151, "classes": ["高等科2年ファッション専攻", "高等科2年きもの専攻", "高等科3年ファッション専攻", "高等科3年きもの専攻", "経理情報科2年", "経理情報科3年", "福祉科2年", "福祉科3年"], "label": {"高等科2年ファッション専攻": "選択コース：ビジネス / イラスト / パティシエ / ヘア・メイク / eスポーツ / 声優 / 洋裁・和裁 / 福祉実践", "高等科2年きもの専攻": "選択コース：ビジネス / イラスト / パティシエ / ヘア・メイク / eスポーツ / 声優 / 洋裁・和裁 / 福祉実践", "高等科3年ファッション専攻": "選択コース：ビジネス / イラスト / パティシエ / ヘア・メイク / eスポーツ / 声優 / 洋裁・和裁 / 福祉実践", "高等科3年きもの専攻": "選択コース：ビジネス / イラスト / パティシエ / ヘア・メイク / eスポーツ / 声優 / 洋裁・和裁 / 福祉実践", "経理情報科2年": "選択コース：ビジネス / イラスト / パティシエ / ヘア・メイク / eスポーツ / 声優 / 洋裁・和裁 / 福祉実践", "経理情報科3年": "選択コース：ビジネス / イラスト / パティシエ / ヘア・メイク / eスポーツ / 声優 / 洋裁・和裁 / 福祉実践", "福祉科2年": "選択コース：ビジネス / イラスト / パティシエ / ヘア・メイク / eスポーツ / 声優 / 洋裁・和裁 / 福祉実践", "福祉科3年": "選択コース：ビジネス / イラスト / パティシエ / ヘア・メイク / eスポーツ / 声優 / 洋裁・和裁 / 福祉実践"}, "subject": {"高等科2年ファッション専攻": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース：ビジネス", "高等科2年きもの専攻": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース：ビジネス", "高等科3年ファッション専攻": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース：ビジネス", "高等科3年きもの専攻": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース：ビジネス", "経理情報科2年": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース：ビジネス", "経理情報科3年": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース：ビジネス", "福祉科2年": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース：ビジネス", "福祉科3年": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース：ビジネス"}, "teachers": ["AA", "G", "N", "U", "V", "W", "X", "Y", "Z"], "rooms": [], "fixed": false, "teachersBy": {"高等科2年ファッション専攻": ["AA", "G", "N", "U", "V", "W", "X", "Y", "Z"], "高等科2年きもの専攻": ["AA", "G", "N", "U", "V", "W", "X", "Y", "Z"], "高等科3年ファッション専攻": ["AA", "G", "N", "U", "V", "W", "X", "Y", "Z"], "高等科3年きもの専攻": ["AA", "G", "N", "U", "V", "W", "X", "Y", "Z"], "経理情報科2年": ["AA", "G", "N", "U", "V", "W", "X", "Y", "Z"], "経理情報科3年": ["AA", "G", "N", "U", "V", "W", "X", "Y", "Z"], "福祉科2年": ["AA", "G", "N", "U", "V", "W", "X", "Y", "Z"], "福祉科3年": ["AA", "G", "N", "U", "V", "W", "X", "Y", "Z"]}, "roomBy": {"高等科2年ファッション専攻": "", "高等科2年きもの専攻": "", "高等科3年ファッション専攻": "", "高等科3年きもの専攻": "", "経理情報科2年": "", "経理情報科3年": "", "福祉科2年": "", "福祉科3年": ""}, "allRooms": ["事務棟3階", "介護棟4階", "多目的棟", "学生会館3階", "本館2階", "本館3階"]}, {"id": 152, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "漢字検定"}, "subject": {"経理情報科1年": "漢字検定"}, "teachers": ["D"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科1年": ["D"]}, "roomBy": {"経理情報科1年": "本館3階奥"}, "allRooms": ["本館3階奥"]}, {"id": 153, "classes": ["福祉科1年"], "label": {"福祉科1年": "英語"}, "subject": {"福祉科1年": "英語"}, "teachers": ["E"], "rooms": [], "fixed": false, "teachersBy": {"福祉科1年": ["E"]}, "roomBy": {"福祉科1年": "本館2階中央"}, "allRooms": ["本館2階中央"]}, {"id": 154, "classes": ["高等科1年ファッション専攻", "高等科1年きもの専攻"], "label": {"高等科1年ファッション専攻": "漢字検定", "高等科1年きもの専攻": "漢字検定"}, "subject": {"高等科1年ファッション専攻": "漢字検定", "高等科1年きもの専攻": "漢字検定"}, "teachers": ["D"], "rooms": [], "fixed": false, "teachersBy": {"高等科1年ファッション専攻": ["D"], "高等科1年きもの専攻": ["D"]}, "roomBy": {"高等科1年ファッション専攻": "学生会館1階", "高等科1年きもの専攻": "学生会館1階"}, "allRooms": ["学生会館1階"]}, {"id": 155, "classes": ["高等科2年ファッション専攻", "高等科2年きもの専攻", "高等科3年ファッション専攻", "高等科3年きもの専攻", "経理情報科2年", "経理情報科3年", "福祉科2年", "福祉科3年"], "label": {"高等科2年ファッション専攻": "選択コース：ビジネス / イラスト / パティシエ / ヘア・メイク / eスポーツ / 声優 / 洋裁・和裁 / 福祉実践", "高等科2年きもの専攻": "選択コース：ビジネス / イラスト / パティシエ / ヘア・メイク / eスポーツ / 声優 / 洋裁・和裁 / 福祉実践", "高等科3年ファッション専攻": "選択コース：ビジネス / イラスト / パティシエ / ヘア・メイク / eスポーツ / 声優 / 洋裁・和裁 / 福祉実践", "高等科3年きもの専攻": "選択コース：ビジネス / イラスト / パティシエ / ヘア・メイク / eスポーツ / 声優 / 洋裁・和裁 / 福祉実践", "経理情報科2年": "選択コース：ビジネス / イラスト / パティシエ / ヘア・メイク / eスポーツ / 声優 / 洋裁・和裁 / 福祉実践", "経理情報科3年": "選択コース：ビジネス / イラスト / パティシエ / ヘア・メイク / eスポーツ / 声優 / 洋裁・和裁 / 福祉実践", "福祉科2年": "選択コース：ビジネス / イラスト / パティシエ / ヘア・メイク / eスポーツ / 声優 / 洋裁・和裁 / 福祉実践", "福祉科3年": "選択コース：ビジネス / イラスト / パティシエ / ヘア・メイク / eスポーツ / 声優 / 洋裁・和裁 / 福祉実践"}, "subject": {"高等科2年ファッション専攻": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース：ビジネス", "高等科2年きもの専攻": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース：ビジネス", "高等科3年ファッション専攻": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース：ビジネス", "高等科3年きもの専攻": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース：ビジネス", "経理情報科2年": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース：ビジネス", "経理情報科3年": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース：ビジネス", "福祉科2年": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース：ビジネス", "福祉科3年": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース：ビジネス"}, "teachers": ["AA", "G", "N", "U", "V", "W", "X", "Y", "Z"], "rooms": [], "fixed": false, "teachersBy": {"高等科2年ファッション専攻": ["AA", "G", "N", "U", "V", "W", "X", "Y", "Z"], "高等科2年きもの専攻": ["AA", "G", "N", "U", "V", "W", "X", "Y", "Z"], "高等科3年ファッション専攻": ["AA", "G", "N", "U", "V", "W", "X", "Y", "Z"], "高等科3年きもの専攻": ["AA", "G", "N", "U", "V", "W", "X", "Y", "Z"], "経理情報科2年": ["AA", "G", "N", "U", "V", "W", "X", "Y", "Z"], "経理情報科3年": ["AA", "G", "N", "U", "V", "W", "X", "Y", "Z"], "福祉科2年": ["AA", "G", "N", "U", "V", "W", "X", "Y", "Z"], "福祉科3年": ["AA", "G", "N", "U", "V", "W", "X", "Y", "Z"]}, "roomBy": {"高等科2年ファッション専攻": "", "高等科2年きもの専攻": "", "高等科3年ファッション専攻": "", "高等科3年きもの専攻": "", "経理情報科2年": "", "経理情報科3年": "", "福祉科2年": "", "福祉科3年": ""}, "allRooms": ["事務棟3階", "介護棟4階", "多目的棟", "学生会館3階", "本館2階", "本館3階"]}, {"id": 156, "classes": ["経理情報科1年"], "label": {"経理情報科1年": "HR"}, "subject": {"経理情報科1年": "HR"}, "teachers": ["E"], "rooms": [], "fixed": false, "teachersBy": {"経理情報科1年": ["E"]}, "roomBy": {"経理情報科1年": "本館3階奥"}, "allRooms": ["本館3階奥"]}, {"id": 157, "classes": ["福祉科1年"], "label": {"福祉科1年": "HR"}, "subject": {"福祉科1年": "HR"}, "teachers": ["C"], "rooms": [], "fixed": false, "teachersBy": {"福祉科1年": ["C"]}, "roomBy": {"福祉科1年": "本館2階中央"}, "allRooms": ["本館2階中央"]}], "pairs": [[19, 26], [20, 27], [21, 28], [23, 30], [24, 31], [32, 38], [37, 44], [41, 48], [54, 63], [57, 65], [59, 67], [61, 69], [62, 70], [73, 80], [83, 90], [93, 100], [97, 104], [98, 105], [106, 113], [127, 130], [140, 146], [141, 147], [142, 149], [151, 155]], "busy": {"E": ["月1", "月2"], "T": ["月2", "月3", "火4", "火5"], "H": ["月4", "月5", "水1", "水2", "水4", "水5"], "I": ["月1", "月2", "木2", "木3", "火1", "火2", "金1", "金2", "金3", "金4", "金5"], "G": ["月2", "月3"], "M": ["火1", "火2", "火3"], "Z": ["水2", "水3"], "S": ["木2", "木3"], "理事長": ["木1", "木2"], "D": ["金1", "金2"], "F": ["金4", "金5"]}, "teacherDays": {"A": ["月", "火", "水", "木", "金"], "B": ["月", "火", "水", "木", "金"], "D": ["月", "火", "水", "木", "金"], "C": ["月", "火", "水", "木", "金"], "E": ["月", "火", "水", "木", "金"], "F": ["月", "火", "水", "木", "金"], "G": ["月", "火", "木", "金"], "H": ["月", "火", "水", "木", "金"], "I": ["月", "火", "水", "木"], "J": ["月", "水", "金"], "理事長": ["月", "火"], "Q": ["月"], "N": ["金"], "K": ["月", "水"], "L": ["火", "水"], "M": ["火", "水", "木"], "S": ["月"], "T": ["月", "木"], "O": ["火"], "P": ["木"], "R": ["月"], "V": ["金"], "AA": ["金"], "Z": ["金"], "W": ["金"], "Y": ["金"]}, "teacherKinds": {"A": "常勤", "B": "常勤", "D": "常勤", "C": "常勤", "E": "常勤", "F": "常勤", "G": "常勤", "H": "常勤", "I": "常勤", "J": "非常勤", "理事長": "固定", "Q": "外部(固定)", "N": "外部(固定)", "K": "外部(固定)", "L": "外部(固定)", "M": "非常勤", "S": "非常勤", "T": "非常勤", "O": "外部(固定)", "P": "外部(固定)", "R": "外部(固定)", "V": "外部(固定)", "AA": "外部(固定)", "Z": "外部(固定)", "W": "外部", "Y": "外部"}, "r7": {"高等科1年ファッション専攻|月1": "HR", "高等科1年きもの専攻|月1": "和裁", "高等科1年ファッション専攻|月2": "食物", "高等科1年きもの専攻|月2": "食物", "高等科1年ファッション専攻|月3": "洋裁", "高等科1年きもの専攻|月3": "和裁", "高等科1年ファッション専攻|月4": "洋裁", "高等科1年きもの専攻|月4": "和裁", "高等科1年ファッション専攻|月5": "数学", "高等科1年きもの専攻|月5": "数学", "高等科2年ファッション専攻|月1": "日本史", "高等科2年きもの専攻|月1": "日本史", "高等科2年ファッション専攻|月2": "数学", "高等科2年きもの専攻|月2": "数学", "高等科2年ファッション専攻|月3": "秘書", "高等科2年きもの専攻|月3": "秘書", "高等科2年ファッション専攻|月4": "色彩", "高等科2年きもの専攻|月4": "和裁", "高等科2年ファッション専攻|月5": "洋裁", "高等科2年きもの専攻|月5": "和裁", "高等科3年ファッション専攻|月1": "洋裁", "高等科3年きもの専攻|月1": "和裁", "高等科3年ファッション専攻|月2": "洋裁", "高等科3年きもの専攻|月2": "和裁", "高等科3年ファッション専攻|月3": "洋裁", "高等科3年きもの専攻|月3": "和裁", "高等科3年ファッション専攻|月4": "洋裁", "高等科3年きもの専攻|月4": "和裁", "高等科3年ファッション専攻|月5": "F販売", "高等科3年きもの専攻|月5": "和裁", "経理情報科1年|月1": "電卓", "経理情報科1年|月2": "時事問題", "経理情報科1年|月3": "ビジネスの基礎", "経理情報科1年|月4": "未来の地図", "経理情報科1年|月5": "未来の地図", "経理情報科2年|月1": "日本史", "経理情報科2年|月2": "数学", "経理情報科2年|月3": "秘書", "経理情報科2年|月4": "表計算", "経理情報科2年|月5": "表計算", "経理情報科3年|月1": "ビジネスの応用", "経理情報科3年|月2": "HR", "経理情報科3年|月3": "数学", "経理情報科3年|月4": "簿記", "経理情報科3年|月5": "政治経済", "福祉科1年|月1": "食物", "福祉科1年|月2": "体育", "福祉科1年|月3": "体育", "福祉科1年|月4": "手話", "福祉科1年|月5": "手話", "福祉科2年|月1": "日本史", "福祉科2年|月2": "数学", "福祉科2年|月3": "秘書", "福祉科2年|月4": "介護実技", "福祉科2年|月5": "介護実技", "福祉科3年|月1": "家庭総合", "福祉科3年|月2": "HR", "福祉科3年|月3": "ワープロ", "福祉科3年|月4": "図画工作", "福祉科3年|月5": "図画工作", "高等科1年ファッション専攻|火1": "洋裁", "高等科1年きもの専攻|火1": "和裁", "高等科1年ファッション専攻|火2": "洋裁", "高等科1年きもの専攻|火2": "和裁", "高等科1年ファッション専攻|火3": "公共", "高等科1年きもの専攻|火3": "公共", "高等科1年ファッション専攻|火4": "体育", "高等科1年きもの専攻|火4": "体育", "高等科1年ファッション専攻|火5": "体育", "高等科1年きもの専攻|火5": "体育", "高等科2年ファッション専攻|火1": "スタイル画", "高等科2年きもの専攻|火1": "和裁", "高等科2年ファッション専攻|火2": "ワープロ", "高等科2年きもの専攻|火2": "ワープロ", "高等科2年ファッション専攻|火3": "洋裁", "高等科2年きもの専攻|火3": "和裁", "高等科2年ファッション専攻|火4": "洋裁", "高等科2年きもの専攻|火4": "和裁", "高等科2年ファッション専攻|火5": "洋裁", "高等科2年きもの専攻|火5": "和裁", "高等科3年ファッション専攻|火1": "倫理", "高等科3年きもの専攻|火1": "倫理", "高等科3年ファッション専攻|火2": "国語", "高等科3年きもの専攻|火2": "国語", "高等科3年ファッション専攻|火3": "電卓", "高等科3年きもの専攻|火3": "電卓", "高等科3年ファッション専攻|火4": "ワープロ", "高等科3年きもの専攻|火4": "ワープロ", "高等科3年ファッション専攻|火5": "洋裁", "高等科3年きもの専攻|火5": "和裁", "経理情報科1年|火1": "ワープロ", "経理情報科1年|火2": "体育", "経理情報科1年|火3": "体育", "経理情報科1年|火4": "eスポーツコース・簿記コース", "経理情報科1年|火5": "eスポーツコース・簿記コース", "経理情報科2年|火1": "簿記", "経理情報科2年|火2": "簿記", "経理情報科2年|火3": "電卓", "経理情報科2年|火4": "商品開発", "経理情報科2年|火5": "ワープロ", "経理情報科3年|火1": "倫理", "経理情報科3年|火2": "国語", "経理情報科3年|火3": "基礎簿記", "経理情報科3年|火4": "政治経済", "経理情報科3年|火5": "ビジネスの応用", "福祉科1年|火1": "図画工作", "福祉科1年|火2": "図画工作", "福祉科1年|火3": "公共", "福祉科1年|火4": "社会福祉の基礎", "福祉科1年|火5": "英語", "福祉科2年|火1": "社会人常識マナー検定", "福祉科2年|火2": "漢字検定", "福祉科2年|火3": "電卓", "福祉科2年|火4": "調理", "福祉科2年|火5": "調理", "福祉科3年|火1": "倫理", "福祉科3年|火2": "国語", "福祉科3年|火3": "調理", "福祉科3年|火4": "初任者研修", "福祉科3年|火5": "初任者研修", "高等科1年ファッション専攻|水1": "洋裁", "高等科1年きもの専攻|水1": "和裁", "高等科1年ファッション専攻|水2": "洋裁", "高等科1年きもの専攻|水2": "和裁", "高等科1年ファッション専攻|水3": "洋裁", "高等科1年きもの専攻|水3": "和裁", "高等科1年ファッション専攻|水4": "英語", "高等科1年きもの専攻|水4": "英語", "高等科1年ファッション専攻|水5": "簿記", "高等科1年きもの専攻|水5": "簿記", "高等科2年ファッション専攻|水1": "英語", "高等科2年きもの専攻|水1": "英語", "高等科2年ファッション専攻|水2": "社会人常識マナー検定", "高等科2年きもの専攻|水2": "社会人常識マナー検定", "高等科2年ファッション専攻|水3": "漢字検定", "高等科2年きもの専攻|水3": "漢字検定", "高等科2年ファッション専攻|水4": "洋裁", "高等科2年きもの専攻|水4": "和裁", "高等科2年ファッション専攻|水5": "洋裁", "高等科2年きもの専攻|水5": "和裁", "高等科3年ファッション専攻|水1": "洋裁", "高等科3年きもの専攻|水1": "和裁", "高等科3年ファッション専攻|水2": "洋裁", "高等科3年きもの専攻|水2": "和裁", "高等科3年ファッション専攻|水3": "洋裁", "高等科3年きもの専攻|水3": "和裁", "高等科3年ファッション専攻|水4": "美術・進路指導", "高等科3年きもの専攻|水4": "美術・進路指導", "高等科3年ファッション専攻|水5": "漢字検定・美術", "高等科3年きもの専攻|水5": "漢字検定・美術", "経理情報科1年|水1": "数学", "経理情報科1年|水2": "簿記", "経理情報科1年|水3": "英語", "経理情報科1年|水4": "漢字検定", "経理情報科1年|水5": "HR", "経理情報科2年|水1": "英語", "経理情報科2年|水2": "社会人常識マナー検定", "経理情報科2年|水3": "漢字検定", "経理情報科2年|水4": "ワープロ", "経理情報科2年|水5": "ワープロ", "経理情報科3年|水1": "電卓", "経理情報科3年|水2": "体育", "経理情報科3年|水3": "表計算", "経理情報科3年|水4": "美術・進路指導", "経理情報科3年|水5": "漢字検定・美術", "福祉科1年|水1": "こころとからだの理解", "福祉科1年|水2": "数学", "福祉科1年|水3": "HR", "福祉科1年|水4": "簿記", "福祉科1年|水5": "保健体育", "福祉科2年|水1": "英語", "福祉科2年|水2": "保育", "福祉科2年|水3": "保育", "福祉科2年|水4": "初任者研修", "福祉科2年|水5": "初任者研修", "福祉科3年|水1": "電卓", "福祉科3年|水2": "ワープロ", "福祉科3年|水3": "体育", "福祉科3年|水4": "美術・進路指導", "福祉科3年|水5": "漢字検定・美術", "高等科1年ファッション専攻|木1": "洋裁講義", "高等科1年きもの専攻|木1": "和裁", "高等科1年ファッション専攻|木2": "洋裁", "高等科1年きもの専攻|木2": "和裁", "高等科1年ファッション専攻|木3": "洋裁", "高等科1年きもの専攻|木3": "和裁", "高等科1年ファッション専攻|木4": "礼法", "高等科1年きもの専攻|木4": "礼法", "高等科1年ファッション専攻|木5": "ペン字", "高等科1年きもの専攻|木5": "ペン字", "高等科2年ファッション専攻|木1": "国語", "高等科2年きもの専攻|木1": "国語", "高等科2年ファッション専攻|木2": "電卓", "高等科2年きもの専攻|木2": "電卓", "高等科2年ファッション専攻|木3": "HR", "高等科2年きもの専攻|木3": "和裁", "高等科2年ファッション専攻|木4": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "高等科2年きもの専攻|木4": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "高等科2年ファッション専攻|木5": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "高等科2年きもの専攻|木5": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "高等科3年ファッション専攻|木1": "洋裁", "高等科3年きもの専攻|木1": "和裁", "高等科3年ファッション専攻|木2": "英語", "高等科3年きもの専攻|木2": "英語", "高等科3年ファッション専攻|木3": "HR", "高等科3年きもの専攻|木3": "和裁", "高等科3年ファッション専攻|木4": "", "高等科3年きもの専攻|木4": "", "高等科3年ファッション専攻|木5": "", "高等科3年きもの専攻|木5": "", "経理情報科1年|木1": "簿記", "経理情報科1年|木2": "時事問題", "経理情報科1年|木3": "情報処理", "経理情報科1年|木4": "ペン字", "経理情報科1年|木5": "礼法", "経理情報科2年|木1": "国語", "経理情報科2年|木2": "商品開発", "経理情報科2年|木3": "HR", "経理情報科2年|木4": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "経理情報科2年|木5": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "経理情報科3年|木1": "簿記", "経理情報科3年|木2": "英語", "経理情報科3年|木3": "ワープロ", "経理情報科3年|木4": "", "経理情報科3年|木5": "", "福祉科1年|木1": "音楽", "福祉科1年|木2": "ワープロ", "福祉科1年|木3": "こころとからだの理解", "福祉科1年|木4": "礼法", "福祉科1年|木5": "ペン字", "福祉科2年|木1": "国語", "福祉科2年|木2": "音楽", "福祉科2年|木3": "HR", "福祉科2年|木4": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "福祉科2年|木5": "パソコン・体育・和裁・小論文・洋裁・簿記・電卓・選択授業:福祉", "福祉科3年|木1": "家庭総合", "福祉科3年|木2": "英語", "福祉科3年|木3": "音楽", "福祉科3年|木4": "", "福祉科3年|木5": "", "高等科1年ファッション専攻|金1": "電卓", "高等科1年きもの専攻|金1": "電卓", "高等科1年ファッション専攻|金2": "美術", "高等科1年きもの専攻|金2": "美術", "高等科1年ファッション専攻|金3": "ワープロ", "高等科1年きもの専攻|金3": "ワープロ", "高等科1年ファッション専攻|金4": "国語", "高等科1年きもの専攻|金4": "国語", "高等科1年ファッション専攻|金5": "漢字検定", "高等科1年きもの専攻|金5": "漢字検定", "高等科2年ファッション専攻|金1": "洋裁", "高等科2年きもの専攻|金1": "和裁", "高等科2年ファッション専攻|金2": "洋裁", "高等科2年きもの専攻|金2": "和裁", "高等科2年ファッション専攻|金3": "洋裁", "高等科2年きもの専攻|金3": "和裁", "高等科2年ファッション専攻|金4": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース:ビジネス", "高等科2年きもの専攻|金4": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース:ビジネス", "高等科2年ファッション専攻|金5": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース:ビジネス", "高等科2年きもの専攻|金5": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース:ビジネス", "高等科3年ファッション専攻|金1": "世界史", "高等科3年きもの専攻|金1": "世界史", "高等科3年ファッション専攻|金2": "社会人常識", "高等科3年きもの専攻|金2": "和裁", "高等科3年ファッション専攻|金3": "洋裁", "高等科3年きもの専攻|金3": "和裁", "高等科3年ファッション専攻|金4": "", "高等科3年きもの専攻|金4": "", "高等科3年ファッション専攻|金5": "", "高等科3年きもの専攻|金5": "", "経理情報科1年|金1": "公共", "経理情報科1年|金2": "ワープロ", "経理情報科1年|金3": "美術", "経理情報科1年|金4": "ビジネスの基礎", "経理情報科1年|金5": "国語", "経理情報科2年|金1": "ワープロ", "経理情報科2年|金2": "簿記", "経理情報科2年|金3": "簿記", "経理情報科2年|金4": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース:ビジネス", "経理情報科2年|金5": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース:ビジネス", "経理情報科3年|金1": "世界史", "経理情報科3年|金2": "未来の地図", "経理情報科3年|金3": "未来の地図", "経理情報科3年|金4": "", "経理情報科3年|金5": "", "福祉科1年|金1": "電卓", "福祉科1年|金2": "美術", "福祉科1年|金3": "保健体育", "福祉科1年|金4": "国語", "福祉科1年|金5": "漢字検定", "福祉科2年|金1": "ワープロ", "福祉科2年|金2": "レクリエーション", "福祉科2年|金3": "レクリエーション", "福祉科2年|金4": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース:ビジネス", "福祉科2年|金5": "eスポーツ・イラスト・パティシエ・ヘア・メイク・声優・洋裁・和裁・福祉実践・選択コース:ビジネス", "福祉科3年|金1": "世界史", "福祉科3年|金2": "介護実技", "福祉科3年|金3": "介護実技", "福祉科3年|金4": "", "福祉科3年|金5": ""}, "plans": [{"key": "A", "name": "案A", "title": "前年の形を活かす案", "desc": "先生も生徒も慣れた、前年と同じ曜日・時限をできるだけ残しました。", "slots": ["月2", "月1", "月2", "月1", "月1", "月4", "月1", "水3", "月2", "月1", "月2", "月2", "月3", "月3", "月3", "月3", "月3", "月3", "月4", "月4", "火1", "月4", "水2", "月4", "月4", "月5", "月5", "火2", "月5", "木3", "月5", "月5", "木1", "火1", "火1", "金4", "水4", "火1", "木2", "火2", "火2", "金1", "火5", "火2", "火2", "火3", "金1", "木1", "金2", "水1", "木3", "木2", "水1", "火3", "火4", "金2", "金2", "火4", "火3", "金2", "月2", "火4", "水2", "火5", "水3", "火5", "水3", "金3", "火4", "火5", "水3", "水1", "水3", "月4", "水1", "水1", "火3", "火5", "水2", "火3", "月5", "火3", "火5", "水2", "金2", "金3", "火5", "水1", "火4", "木1", "水3", "木1", "月1", "水4", "金1", "火2", "水2", "水4", "水4", "水5", "水5", "水5", "金5", "水5", "水5", "水5", "火1", "木1", "火3", "水5", "火4", "木1", "水1", "火2", "木2", "木2", "木2", "木2", "火3", "木2", "木3", "火1", "木3", "火5", "月5", "木3", "木4", "木4", "木4", "木5", "木5", "木5", "金1", "火3", "水4", "木3", "金1", "金2", "火4", "水2", "金2", "水2", "金2", "水4", "金3", "金3", "金3", "水3", "金5", "金3", "金4", "金4", "水4", "金4", "金5", "金5", "木1", "水3"], "sec": 40.0, "rooms": {"150": {"高等科1年きもの専攻": "本館2階奥", "高等科1年ファッション専攻": "本館2階奥"}, "143": {"高等科1年きもの専攻": "本館2階中央", "高等科1年ファッション専攻": "本館2階中央"}, "114": {"高等科2年ファッション専攻": "本館2階中央", "高等科2年きもの専攻": "本館2階中央"}, "68": {"福祉科1年": "パソコン教室"}, "154": {"高等科1年きもの専攻": "本館2階中央", "高等科1年ファッション専攻": "本館2階中央"}}}, {"key": "B", "name": "案B", "title": "先生の負担を減らす案", "desc": "先生の授業を続けて入れ、空き時間と出勤日を減らしました。座学は集中しやすい午前に寄せています。", "slots": ["月1", "月1", "月1", "木1", "月1", "月4", "水2", "月2", "月2", "月2", "月1", "木2", "月3", "月3", "月2", "月3", "月3", "月3", "月5", "火4", "水1", "月4", "木2", "月4", "月4", "月4", "火5", "水2", "月5", "木5", "月5", "月5", "木1", "火1", "火1", "木5", "火1", "火1", "木2", "火2", "火2", "火1", "火2", "火2", "火2", "火3", "木3", "木3", "火2", "木2", "木3", "火3", "火3", "火3", "火4", "火5", "火5", "月4", "水4", "火4", "火5", "火4", "火4", "火5", "火4", "月5", "火4", "火5", "火4", "火5", "火5", "水1", "水2", "月4", "水1", "月5", "水1", "水3", "水3", "水1", "月5", "火3", "水2", "水2", "月1", "金3", "火3", "木3", "水3", "水3", "水3", "月2", "金4", "水4", "水5", "金4", "水5", "水4", "水4", "水4", "水5", "水4", "水4", "火5", "水5", "水5", "火1", "木1", "木2", "金1", "月2", "木1", "水1", "火2", "木2", "木1", "月3", "火3", "水1", "木2", "水2", "火3", "木3", "水2", "月1", "木3", "木4", "木4", "水3", "木3", "木5", "木2", "金1", "金1", "金1", "金5", "金1", "金2", "金2", "金2", "金2", "金2", "金2", "木5", "金3", "金3", "金3", "金3", "水3", "金3", "水5", "金4", "水5", "金4", "金5", "金5", "木4", "金5"], "sec": 40.1, "rooms": {"114": {"高等科2年ファッション専攻": "本館2階中央", "高等科2年きもの専攻": "本館2階中央"}, "143": {"高等科1年きもの専攻": "本館2階中央", "高等科1年ファッション専攻": "本館2階中央"}, "150": {"高等科1年きもの専攻": "本館2階中央", "高等科1年ファッション専攻": "本館2階中央"}, "154": {"高等科1年きもの専攻": "本館2階奥", "高等科1年ファッション専攻": "本館2階奥"}}}, {"key": "now", "name": "参考", "title": "今の時間割", "desc": "担当の先生が手作業で作った、令和8年度前期の時間割です。", "slots": ["月1", "月1", "月1", "月1", "月1", "月1", "月1", "月2", "月2", "月2", "月2", "月2", "月3", "月3", "月3", "月3", "月3", "月3", "月4", "月4", "月4", "月4", "月4", "月4", "月4", "月5", "月5", "月5", "月5", "月5", "月5", "月5", "火1", "火1", "火1", "火1", "火1", "火1", "火2", "火2", "火2", "火2", "火2", "火2", "火2", "火3", "火3", "火3", "火3", "火3", "火3", "火3", "火3", "火3", "火4", "火4", "火4", "火4", "火4", "火4", "火4", "火4", "火4", "火5", "火5", "火5", "火5", "火5", "火5", "火5", "火5", "水1", "水1", "水1", "水1", "水1", "水1", "水1", "水2", "水2", "水2", "水2", "水2", "水2", "水2", "水3", "水3", "水3", "水3", "水3", "水3", "水3", "水4", "水4", "水4", "水4", "水4", "水4", "水4", "水5", "水5", "水5", "水5", "水5", "水5", "水5", "木1", "木1", "木1", "木1", "木1", "木1", "木1", "木2", "木2", "木2", "木2", "木2", "木2", "木2", "木3", "木3", "木3", "木3", "木3", "木3", "木4", "木4", "木4", "木5", "木5", "木5", "金1", "金1", "金1", "金1", "金1", "金2", "金2", "金2", "金2", "金2", "金2", "金3", "金3", "金3", "金3", "金3", "金3", "金3", "金4", "金4", "金4", "金4", "金5", "金5", "金5", "金5"], "sec": null, "rooms": {}}], "cap": {"事務棟3階": 16, "パソコン教室": 24, "本館3階": 42, "本館3階奥": 24, "本館2階": 42, "本館2階奥": 20, "本館2階中央": 20, "学生会館3階": 36, "学生会館2階": 18, "学生会館1階": 16, "和裁教室": 15, "多目的棟": 18}, "heads": {"高等科1年ファッション専攻": 15, "高等科1年きもの専攻": 4, "高等科2年ファッション専攻": 13, "高等科2年きもの専攻": 5, "高等科3年ファッション専攻": 14, "高等科3年きもの専攻": 2, "経理情報科1年": 24, "経理情報科2年": 20, "経理情報科3年": 17, "福祉科1年": 20, "福祉科2年": 18, "福祉科3年": 13}, "lower": {"月": [{"school": "委託訓練(実務者研修科)", "class": "実務者研修科", "cells": {"1": {"subject": "社会の理解", "room": "", "teacher": "E先生"}, "2": {"subject": "医療的ケア", "room": "", "teacher": "T先生"}, "3": {"subject": "就職支援", "room": "", "teacher": "H先生"}, "4": {"subject": "", "room": "", "teacher": ""}}}, {"school": "文化産業専門学校", "class": "ITビジネス科1年", "cells": {"1": {"subject": "パソコン演習", "room": "パソコン教室", "teacher": "I先生"}, "2": {"subject": "電卓", "room": "(介護棟5階)", "teacher": "G先生"}, "3": {"subject": "日商簿記", "room": "(介護棟5階)", "teacher": "AB"}, "4": {"subject": "ビジネスマナー(1.3.5週) / 漢字検定", "room": "", "teacher": "C先生 / E先生"}}}, {"school": "文化産業専門学校", "class": "ITビジネス科2年", "cells": {"1": {"subject": "パソコン演習", "room": "パソコン教室", "teacher": "I先生"}, "2": {"subject": "電卓", "room": "(介護棟5階)", "teacher": "G先生"}, "3": {"subject": "日商簿記", "room": "(介護棟5階)", "teacher": "AB"}, "4": {"subject": "ビジネスマナー(1.3.5週) / 漢字検定", "room": "", "teacher": "C先生 / E先生"}}}, {"school": "文化産業専門学校", "class": "ファッション学科1年", "cells": {"1": {"subject": "パソコン演習", "room": "パソコン教室", "teacher": "I先生"}, "2": {"subject": "電卓", "room": "(介護棟5階)", "teacher": "G先生"}, "3": {"subject": "和裁", "room": "和裁教室", "teacher": "A先生"}, "4": {"subject": "ビジネスマナー(1.3.5週)", "room": "", "teacher": "C先生"}}}, {"school": "文化産業専門学校", "class": "ファッション学科2年", "cells": {"1": {"subject": "パソコン演習", "room": "パソコン教室", "teacher": "I先生"}, "2": {"subject": "電卓", "room": "(介護棟5階)", "teacher": "G先生"}, "3": {"subject": "和裁", "room": "和裁教室", "teacher": "A先生"}, "4": {"subject": "ビジネスマナー(1.3.5週)", "room": "", "teacher": "C先生"}}}], "火": [{"school": "委託訓練(実務者研修科)", "class": "実務者研修科", "cells": {"1": {"subject": "介護過程Ⅲ(実技)", "room": "", "teacher": "M先生"}, "2": {"subject": "介護過程Ⅲ(実技)", "room": "", "teacher": "M先生"}, "3": {"subject": "医療的ケア", "room": "", "teacher": "T先生"}, "4": {"subject": "", "room": "", "teacher": ""}}}, {"school": "文化産業専門学校", "class": "ITビジネス科1年", "cells": {"1": {"subject": "簿記", "room": "介護棟5階", "teacher": "I先生"}, "2": {"subject": "社会福祉事務", "room": "介護棟5階", "teacher": "AB"}, "3": {"subject": "", "room": "", "teacher": ""}, "4": {"subject": "", "room": "", "teacher": ""}}}, {"school": "文化産業専門学校", "class": "ITビジネス科2年", "cells": {"1": {"subject": "簿記", "room": "介護棟5階", "teacher": "I先生"}, "2": {"subject": "社会福祉事務", "room": "介護棟5階", "teacher": "AB"}, "3": {"subject": "", "room": "", "teacher": ""}, "4": {"subject": "", "room": "", "teacher": ""}}}, {"school": "文化産業専門学校", "class": "ファッションクリエイトきもの科1年", "cells": {"1": {"subject": "簿記", "room": "介護棟5階", "teacher": "I先生"}, "2": {"subject": "和裁", "room": "介護棟5階", "teacher": ""}, "3": {"subject": "和裁", "room": "和裁教室", "teacher": ""}, "4": {"subject": "", "room": "", "teacher": ""}}}, {"school": "文化産業専門学校", "class": "ファッションクリエイトきもの科2年", "cells": {"1": {"subject": "簿記", "room": "介護棟5階", "teacher": "I先生"}, "2": {"subject": "和裁", "room": "和裁教室", "teacher": ""}, "3": {"subject": "和裁", "room": "和裁教室", "teacher": ""}, "4": {"subject": "", "room": "", "teacher": ""}}}], "水": [{"school": "委託訓練(実務者研修科)", "class": "実務者研修科", "cells": {"1": {"subject": "レクリエーション／発達と老化の理解", "room": "", "teacher": "AC先生/S先生"}, "2": {"subject": "障害の理解", "room": "", "teacher": "AD先生"}, "3": {"subject": "認知症の理解", "room": "", "teacher": "AE先生"}, "4": {"subject": "", "room": "", "teacher": ""}}}, {"school": "文化産業専門学校", "class": "ITビジネス科1年", "cells": {"1": {"subject": "社会人常識マナー", "room": "介護棟5階", "teacher": "H先生"}, "2": {"subject": "eスポーツコース", "room": "事務棟3階", "teacher": "Z先生"}, "3": {"subject": "初任者研修", "room": "学生会館3階", "teacher": "K先生"}, "4": {"subject": "コンピュータ会計", "room": "パソコン教室", "teacher": ""}}}, {"school": "文化産業専門学校", "class": "ITビジネス科2年", "cells": {"1": {"subject": "社会人常識マナー", "room": "介護棟5階", "teacher": "H先生"}, "2": {"subject": "eスポーツコース", "room": "", "teacher": "Z先生"}, "3": {"subject": "就職支援(1.3.5週)", "room": "介護棟5階", "teacher": "H先生"}, "4": {"subject": "コンピュータ会計(1.3.5週のみ)", "room": "パソコン教室", "teacher": ""}}}, {"school": "文化産業専門学校", "class": "ファッション学科1年", "cells": {"1": {"subject": "社会人常識マナー", "room": "介護棟5階", "teacher": "H先生"}, "2": {"subject": "和裁", "room": "和裁教室", "teacher": "A先生"}, "3": {"subject": "初任者研修", "room": "学生会館3階", "teacher": "K先生"}, "4": {"subject": "", "room": "", "teacher": ""}}}, {"school": "文化産業専門学校", "class": "ファッション学科2年", "cells": {"1": {"subject": "社会人常識マナー", "room": "介護棟5階", "teacher": "H先生"}, "2": {"subject": "和裁", "room": "和裁教室", "teacher": "A先生"}, "3": {"subject": "就職支援(1.3.5週)", "room": "介護棟5階", "teacher": "H先生"}, "4": {"subject": "", "room": "", "teacher": ""}}}], "木": [{"school": "委託訓練(実務者研修科)", "class": "実務者研修科", "cells": {"1": {"subject": "こころとからだのしくみ", "room": "", "teacher": "AF先生"}, "2": {"subject": "発達と老化の理解", "room": "", "teacher": "S先生"}, "3": {"subject": "介護の基本", "room": "", "teacher": "AG先生"}, "4": {"subject": "", "room": "", "teacher": ""}}}, {"school": "文化産業専門学校", "class": "ITビジネス科1年", "cells": {"1": {"subject": "法学", "room": "介護棟5階", "teacher": "理事長"}, "2": {"subject": "プログラミング", "room": "パソコン教室", "teacher": "I先生"}, "3": {"subject": "", "room": "", "teacher": ""}, "4": {"subject": "", "room": "", "teacher": ""}}}, {"school": "文化産業専門学校", "class": "ITビジネス科2年", "cells": {"1": {"subject": "法学", "room": "介護棟5階", "teacher": "理事長"}, "2": {"subject": "プログラミング", "room": "パソコン教室", "teacher": "I先生"}, "3": {"subject": "", "room": "", "teacher": ""}, "4": {"subject": "", "room": "", "teacher": ""}}}, {"school": "文化産業専門学校", "class": "ファッション学科1年", "cells": {"1": {"subject": "法学", "room": "介護棟5階", "teacher": "理事長"}, "2": {"subject": "プログラミング", "room": "パソコン教室", "teacher": "I先生"}, "3": {"subject": "和裁", "room": "和裁教室", "teacher": "A先生"}, "4": {"subject": "", "room": "", "teacher": ""}}}, {"school": "文化産業専門学校", "class": "ファッション学科2年", "cells": {"1": {"subject": "法学", "room": "介護棟5階", "teacher": "理事長"}, "2": {"subject": "和裁", "room": "和裁教室", "teacher": "A先生"}, "3": {"subject": "和裁", "room": "和裁教室", "teacher": "A先生"}, "4": {"subject": "", "room": "", "teacher": ""}}}], "金": [{"school": "委託訓練", "class": "実務者研修科", "cells": {"1": {"subject": "介護過程", "room": "", "teacher": "D先生"}, "2": {"subject": "こころとからだのしくみ", "room": "", "teacher": "AF先生"}, "3": {"subject": "パソコン", "room": "", "teacher": "F先生"}, "4": {"subject": "", "room": "", "teacher": ""}}}, {"school": "文化産業専門学校", "class": "ITビジネス科1年", "cells": {"1": {"subject": "情報処理", "room": "介護棟5階", "teacher": "I先生"}, "2": {"subject": "工業簿記", "room": "(介護棟5階)", "teacher": "I先生"}, "3": {"subject": "情報処理", "room": "手書き5F", "teacher": "I先生"}, "4": {"subject": "介護実技", "room": "介護実習室", "teacher": "AF先生"}}}, {"school": "文化産業専門学校", "class": "ITビジネス科2年", "cells": {"1": {"subject": "情報処理", "room": "", "teacher": "I先生"}, "2": {"subject": "工業簿記", "room": "(介護棟5階)", "teacher": "I先生"}, "3": {"subject": "初任者研修", "room": "介護棟5階(手書き4F)", "teacher": "AF先生"}, "4": {"subject": "介護実技", "room": "介護実習室", "teacher": "AF先生"}}}, {"school": "文化産業専門学校", "class": "ファッション学科1年", "cells": {"1": {"subject": "和裁", "room": "", "teacher": "A先生"}, "2": {"subject": "和裁", "room": "", "teacher": "A先生"}, "3": {"subject": "情報処理", "room": "手書き5F", "teacher": "I先生"}, "4": {"subject": "介護実技", "room": "介護実習室", "teacher": "AF先生"}}}, {"school": "文化産業専門学校", "class": "ファッション学科2年", "cells": {"1": {"subject": "情報処理", "room": "", "teacher": "I先生"}, "2": {"subject": "和裁", "room": "", "teacher": "A先生"}, "3": {"subject": "初任者研修", "room": "手書き4F", "teacher": "AF先生"}, "4": {"subject": "介護実技", "room": "介護実習室", "teacher": "AF先生"}}}]}};
+const LAYOUT = /*LAYOUT*/"school";  // app：今までの画面／school：学校の紙と同じ様式で整える（アプリ2）
+const DAYS = DATA.days, PERIODS = DATA.periods, CLASSES = DATA.classes, L = DATA.lessons;
+const SLOTS = DAYS.flatMap(d => PERIODS.map(p => d + p));
+const T = s => s === "理事長" ? s : s + "先生";
+const short = c => c.replace("高等科", "高").replace("経理情報科", "経").replace("福祉科", "福").replace("年", "").replace("ファッション専攻", "ファ").replace("きもの専攻", "きも");
+const TB = (x, c) => (c && x.teachersBy?.[c]) || x.teachers;  // そのクラスの先生（無ければ授業全体の先生）
+const RB = (x, c, pl = P) => pl.hand?.[x.id]?.[c] ?? pl.rooms?.[x.id]?.[c] ?? x.roomBy?.[c] ?? "";  // 案ごとの、そのクラスの教室（先生が書き込んだ教室が最優先）
+const HAND = (x, c, pl = P) => c != null && pl.hand?.[x.id]?.[c] != null;
+const RM = (x, c) => selName(x) ? "各教室" : c ? RB(x, c) : [...LR(x)].join("・");
+const LR = (x, pl = P) => selName(x) ? new Set(x.allRooms) : new Set(x.classes.flatMap(c => RB(x, c, pl).split("・").filter(Boolean)));  // 授業が使う教室すべて
+const HD = c => DATA.heads?.[c];
+// 同じ教室を使うクラスのまとまりごとに、生徒数と定員を比べる
+function seats(x, pl = P) {
+  if (selName(x)) return [];
+  const comp = [];
+  x.classes.forEach(c => { const rr = new Set(RB(x, c, pl).split("・").filter(Boolean)); if (!rr.size) return;
+    let cs = new Set([c]); for (const k of comp.filter(k => [...k.rr].some(r => rr.has(r)))) { k.cs.forEach(v => cs.add(v)); k.rr.forEach(v => rr.add(v)); comp.splice(comp.indexOf(k), 1); }
+    comp.push({cs, rr}); });
+  return comp.map(k => ({cs:[...k.cs], rr:[...k.rr], n:[...k.cs].reduce((a, c) => a + (HD(c) || 0), 0), cap:[...k.rr].reduce((a, r) => a + (DATA.cap?.[r] ?? 999), 0)}));
+}
+const $ = id => document.getElementById(id);
+const ids = () => L.map((x, i) => i);
+const adj = (a, b) => a[0] === b[0] && Math.abs(+a.slice(1) - +b.slice(1)) === 1 && !([a, b].every(s => ["3","4"].includes(s.slice(1))));
+const selName = x => (x.label[x.classes[0]].match(/選択(授業|コース)/) || [])[0];
+const subj = (x, c) => selName(x) || x.subject[c];
+function group(x) {
+  const s = Object.values(x.subject).join("");
+  if (/選択/.test(s)) return "g-sel";
+  if (/HR/.test(s) && !/和裁/.test(s)) return "g-hr";
+  if (/洋裁|和裁|スタイル画|ファッション|色彩|食物/.test(s)) return "g-fash";
+  if (/介護|初任者|保育|調理|レクリエーション|福祉|こころ|手話/.test(s)) return "g-care";
+  if (/簿記|電卓|ワープロ|表計算|情報|ビジネス|マーケ|商品|未来|パソコン/.test(s)) return "g-biz";
+  if (/体育|図画工作/.test(s)) return "g-move";
+  return "g-gen";
+}
+
+// ===== 条件 =====
+const RULES = [
+  {key:"t2", g:0, lv:"ng"}, {key:"day", g:0, lv:"ng"}, {key:"busy", g:0, lv:"ng"}, {key:"fix", g:0, lv:"ng"},
+  {key:"c2", g:1, lv:"ng"}, {key:"room", g:1, lv:"ng"}, {key:"seat", g:1, lv:"warn"},
+  {key:"pair", g:2, lv:"warn"}, {key:"zagaku", g:2, lv:"warn"}, {key:"extday", g:2, lv:"warn"},
+];
+const GROUPS = [
+  {name:"先生の都合", ok:"重なり・出勤日・兼務、すべて問題なし"},
+  {name:"生徒と教室", ok:"授業の重なり・教室の重なり・定員、問題なし"},
+  {name:"授業のバランス", ok:"2コマ続き・座学の偏り、問題なし"},
+];
+let ORIG, ORIG_DAYS, ROOM_CAP = {};
+function check(slots, pl = P) {
+  const out = Object.fromEntries(RULES.map(r => [r.key, []]));
+  const at = {};
+  L.forEach((x, i) => (at[slots[i]] ??= []).push(i));
+  const nm = i => `${L[i].classes.map(short).join("・")} ${subj(L[i], L[i].classes[0])}`;
+  for (const s of SLOTS) {
+    const byT = {}, byC = {}, byR = {};
+    (at[s] || []).forEach(i => { L[i].teachers.forEach(t => (byT[t] ??= []).push(i)); L[i].classes.forEach(c => (byC[c] ??= []).push(i)); LR(L[i], pl).forEach(r => (byR[r] ??= []).push(i)); });
+    for (const [t, v] of Object.entries(byT)) if (v.length > 1) out.t2.push({text:`${T(t)}が ${s}限 に${v.length}か所`, ids:v, teacher:t});
+    for (const [c, v] of Object.entries(byC)) if (v.length > 1) out.c2.push({text:`${c}の ${s}限 に授業が${v.length}つ`, ids:v, cls:c});
+    for (const [r, v] of Object.entries(byR)) if (v.length > (ROOM_CAP[r] || 1)) out.room.push({text:`${r}を ${s}限 に${v.length}クラスが使います`, ids:v});
+  }
+  L.forEach((x, i) => seats(x, pl).forEach(k => { if (k.n > k.cap) out.seat.push({text:`${k.cs.map(short).join("・")} ${subj(x, k.cs[0])}（${slots[i]}）：${k.n}人が${k.rr.join("・")}（定員${k.cap}人）`, ids:[i], cls:k.cs[0]}); }));
+  L.forEach((x, i) => {
+    const s = slots[i];
+    x.teachers.forEach(t => {
+      const d = DATA.teacherDays[t];
+      if (d && !d.includes(s[0])) out.day.push({text:`${T(t)}は${s[0]}曜に来ません（${nm(i)}）`, ids:[i], teacher:t});
+      if ((DATA.busy[t] || []).includes(s)) out.busy.push({text:`${T(t)}は ${s}限 に専門学校の授業（${nm(i)}）`, ids:[i], teacher:t});
+    });
+    if (x.fixed && s !== ORIG[i]) out.fix.push({text:`${nm(i)}は ${ORIG[i]}限 で固定です`, ids:[i]});
+  });
+  for (const [i, j] of DATA.pairs) if (!adj(slots[i], slots[j])) out.pair.push({text:`${nm(i)}の2コマ続きが離れました`, ids:[i, j], cls:L[i].classes[0]});
+  for (const c of CLASSES) for (const d of DAYS) {
+    const cnt = {};
+    L.forEach((x, i) => { if (x.classes.includes(c) && slots[i][0] === d && DATA.zagaku.includes(x.subject[c])) (cnt[x.subject[c]] ??= []).push(i); });
+    for (const [s, v] of Object.entries(cnt)) if (v.length > 1) out.zagaku.push({text:`${short(c)}の${d}曜に${s}が${v.length}コマ`, ids:v, cls:c});
+  }
+  const nd = {};
+  L.forEach((x, i) => x.teachers.forEach(t => (nd[t] ??= new Set()).add(slots[i][0])));
+  for (const [t, ds] of Object.entries(nd)) {
+    if (!DATA.outside.includes(DATA.teacherKinds[t] || "")) continue;
+    const add = [...ds].filter(d => !ORIG_DAYS[t].has(d));
+    if (add.length) out.extday.push({text:`${T(t)}の来る日が増えます（${add.join("")}曜）`, ids:ids().filter(i => L[i].teachers.includes(t) && add.includes(slots[i][0])), teacher:t});
+  }
+  return out;
+}
+const ngCount = r => RULES.filter(x => x.lv === "ng").reduce((n, x) => n + r[x.key].length, 0);
+function metrics(slots, pl = P) {
+  let same = 0, cells = 0, zag = 0, am = 0;
+  L.forEach((x, i) => x.classes.forEach(c => { cells++; if (DATA.r7[`${c}|${slots[i]}`] === x.subject[c]) same++; if (DATA.zagaku.includes(x.subject[c])) { zag++; if (+slots[i].slice(1) <= 3) am++; } }));
+  const per = {};
+  L.forEach((x, i) => x.teachers.forEach(t => ((per[t] ??= {})[slots[i][0]] ??= new Set()).add(+slots[i].slice(1))));
+  let gaps = 0, outDays = 0;
+  for (const [t, byDay] of Object.entries(per)) for (const ps of Object.values(byDay)) { const a = [...ps]; gaps += Math.max(...a) - Math.min(...a) + 1 - a.length; if (DATA.outside.includes(DATA.teacherKinds[t] || "")) outDays++; }
+  return {ng: ngCount(check(slots, pl)), same: same / cells, gaps, outDays, am: am / zag};
+}
+
+// ===== 状態 =====
+const plans = DATA.plans.map(p => ({...p, cur: p.slots.slice(), hist: []}));
+// v5：教室の重なりを条件に入れて案を組み直したので、前の版で保存した状態は読み込まない
+try { const s = JSON.parse(localStorage.getItem("jikanwari-v5") || "null"); if (s) plans.forEach(p => { if (s[p.key]?.length === L.length) p.cur = s[p.key]; }); } catch (e) {}
+plans.forEach(p => p.hand = {});
+try { const s = JSON.parse(localStorage.getItem("jikanwari-rooms-v1") || "null"); if (s) plans.forEach(p => { if (s[p.key]) p.hand = s[p.key]; }); } catch (e) {}
+const save = () => { try { localStorage.setItem("jikanwari-v5", JSON.stringify(Object.fromEntries(plans.map(p => [p.key, p.cur])))); localStorage.setItem("jikanwari-rooms-v1", JSON.stringify(Object.fromEntries(plans.map(p => [p.key, p.hand])))); } catch (e) {} };
+let P = plans[0], view = LAYOUT === "school" ? "school" : "class", pick = LAYOUT === "school" ? null : CLASSES[0], result, editing = false;
+ORIG = plans.find(p => p.key === "now").slots;
+ORIG_DAYS = {}; L.forEach((x, i) => x.teachers.forEach(t => (ORIG_DAYS[t] ??= new Set()).add(ORIG[i][0])));
+{ const n = {}; L.forEach((x, i) => x.allRooms.forEach(r => { const k = ORIG[i] + r; n[k] = (n[k] || 0) + 1; ROOM_CAP[r] = Math.max(ROOM_CAP[r] || 1, n[k]); })); }
+
+function moveTo(s0, id, to) {
+  const s = s0.slice(), from = s[id];
+  if (to === from) return s;
+  L.forEach((x, i) => { if (i !== id && s[i] === to && x.classes.some(c => L[id].classes.includes(c))) s[i] = from; });
+  const pr = DATA.pairs.find(p => p.includes(id));
+  s[id] = to;
+  if (pr) {
+    const mate = pr[0] === id ? pr[1] : pr[0], want = to[0] + (+to.slice(1) + (pr[0] === id ? 1 : -1));
+    if (SLOTS.includes(want) && adj(to, want) && s[mate] !== want) {
+      const mf = s[mate];
+      L.forEach((x, i) => { if (i !== mate && i !== id && s[i] === want && x.classes.some(c => L[mate].classes.includes(c))) s[i] = mf; });
+      s[mate] = want;
+    }
+  }
+  return s;
+}
+function doMove(id, to) {
+  if (P.cur[id] === to) return;
+  const before = ngCount(result);
+  P.hist.push(P.cur.slice()); P.cur = moveTo(P.cur, id, to); save(); render();
+  const after = ngCount(result);
+  toast(after > before ? `守れていない条件が${after - before}件あります` : after < before ? `問題が${before - after}件なくなりました` : "動かしました");
+}
+
+// ===== ヒーローの立体見本 =====
+function hero() {
+  const c = "経理情報科2年", a = plans[0].slots;
+  let h = `<div class="mh"><b>${c}</b><span>月　火　水　木　金</span></div><div class="mg">`, k = 0;
+  for (const p of [1, 2, 3, 4, 5]) for (const d of DAYS) {
+    const i = ids().find(i => a[i] === d + p && L[i].classes.includes(c));
+    h += i == null ? `<div style="background:#f5f5f7;animation-delay:${k++ * 25}ms"></div>` : `<div class="${group(L[i])}" style="animation-delay:${k++ * 25}ms">${subj(L[i], c)}</div>`;
+  }
+  $("mock").innerHTML = h + "</div>";
+  const stage = $("stage"), mock = $("mock");
+  const upd = () => { const r = stage.getBoundingClientRect(); const t = Math.min(1, Math.max(0, 1 - r.top / innerHeight)); mock.style.setProperty("--rx", (28 - t * 26).toFixed(1) + "deg"); };
+  addEventListener("scroll", upd, {passive: true}); upd();
+  stage.addEventListener("pointermove", e => { if (e.pointerType !== "mouse") return; const r = stage.getBoundingClientRect(); mock.style.setProperty("--ry", (((e.clientX - r.left) / r.width - .5) * 8).toFixed(1) + "deg"); });
+  stage.addEventListener("pointerleave", () => mock.style.setProperty("--ry", "0deg"));
+}
+
+// ===== 案のカード =====
+function cards() {
+  const ms = plans.map(p => metrics(p.cur, p));
+  const best = (k, hi) => (hi ? Math.max : Math.min)(...ms.map(x => x[k]));
+  const pct = v => Math.round(v * 100) + "%";
+  $("planCards").innerHTML = plans.map((p, i) => {
+    const x = ms[i], b = (k, hi, f) => `<b class="${x[k] === best(k, hi) ? "best" : ""}">${f(x[k])}</b>`;
+    return `<button class="plan rv in ${p === P ? "on" : ""}" data-plan="${p.key}">
+      <div class="tg">${p.key === "now" ? "参考" : p.name}</div><h3>${p.title}</h3><p>${p.desc}</p>
+      <span class="ok ${x.ng ? "ng" : ""}">${x.ng ? `✕ 直す所 ${x.ng}件` : "✓ 条件をすべて守っています"}</span>
+      <div class="m"><span>前年と同じ時間の授業</span>${b("same", true, pct)}</div>
+      <div class="m"><span>先生の空き時間</span>${b("gaps", false, v => v + "コマ")}</div>
+      <div class="m"><span>外部の先生の出勤</span>${b("outDays", false, v => "のべ" + v + "日")}</div>
+      <div class="m"><span>座学が午前</span>${b("am", true, pct)}</div></button>`;
+  }).join("");
+  document.querySelectorAll(".plan").forEach(el => {
+    el.addEventListener("pointermove", e => { if (e.pointerType !== "mouse") return; const r = el.getBoundingClientRect(); el.style.transform = `rotateX(${((e.clientY - r.top) / r.height - .5) * -6}deg) rotateY(${((e.clientX - r.left) / r.width - .5) * 6}deg) translateY(-3px)`; });
+    el.addEventListener("pointerleave", () => el.style.transform = "");
+  });
+}
+
+// ===== 時間割 =====
+function chipHTML(i, c) {
+  const x = L[i];
+  let lv = "";
+  for (const r of RULES) if (result[r.key].some(it => it.ids.includes(i))) lv = r.lv === "ng" ? "ng" : (lv || "warn");
+  const label = view === "class" ? x.label[c] : view === "teacher" ? `${x.classes.map(short).join("・")} ${subj(x, x.classes[0])}` : subj(x, c);
+  const tags = [];
+  if (x.fixed) tags.push("固定");
+  if (x.classes.length > 1 && view === "class") tags.push(`合同 ${x.classes.filter(k => k !== c).map(short).join("・")}`);
+  return `<div class="chip ${group(x)} ${lv} ${P.cur[i] !== P.slots[i] ? "moved" : ""}" data-id="${i}" data-cls="${c || ""}" data-sub="${view === "class" ? subj(x, c) : ""}">
+    <div class="s">${label}</div>${RM(x, c) ? `<div class="r ${HAND(x, c) ? "hand" : ""}">${HAND(x, c) ? "✎" : ""}${view === "all" ? RM(x, c).replaceAll("学生会館", "学生") : RM(x, c)}</div>` : ""}<div class="t">${TB(x, c).map(T).join("・")}</div>
+    ${tags.length ? `<div class="tags">${tags.map(t => `<span class="tag">${t}</span>`).join("")}</div>` : ""}</div>`;
+}
+function schoolChip(i, c) {
+  const x = L[i];
+  let lv = "";
+  for (const r of RULES) if (result[r.key].some(it => it.ids.includes(i))) lv = r.lv === "ng" ? "ng" : (lv || "warn");
+  const sel = selName(x), room = sel ? "各教室" : RB(x, c);
+  return `<div class="chip sc ${group(x)} ${lv} ${P.cur[i] !== P.slots[i] ? "moved" : ""}" data-id="${i}" data-cls="${c}">
+    <div class="l"><div class="s">${sel || x.label[c]}</div>${room ? `<div class="r ${HAND(x, c) ? "hand" : ""}">${HAND(x, c) ? "✎" : ""}${room}</div>` : ""}</div>
+    <div class="tt">${sel ? "" : TB(x, c).map(T).join("<br>")}</div></div>`;
+}
+// 学校の紙と同じ並び（1曜日1枚：学科×1〜6限、各限「教科・教室｜担当」、下に委託訓練・専門学校）。上の段の授業は動かせる
+function schoolBoard(d) {
+  const head = `<tr><th style="width:26px" rowspan="2"></th><th style="width:92px" rowspan="2">学科名</th>${UP_T.map((t, k) => `<th>${k + 1}<small>${t || "&nbsp;"}</small><div class="ct"><i>教科</i><i>担当</i></div></th>`).join("")}</tr>`;
+  let h = `<div class="sbh"><b>${d}曜日</b><span>${SCH_TITLE}｜${P.title}</span></div><table class="scb"><colgroup><col style="width:26px"><col style="width:92px">${UP_T.map((_, k) => `<col style="width:${k < 5 ? 19 : 5}%">`).join("")}</colgroup>${head.replace('<th style="width:26px" rowspan="2"></th><th style="width:92px" rowspan="2">学科名</th>', '<th></th><th>学科名</th>')}`;
+  ROWS.forEach((row, n) => {
+    const cs = CLASSES.filter(c => c.startsWith(row));
+    h += `<tr>${n === 0 ? `<td class="vt" rowspan="${ROWS.length}">立修館高等専修学校</td>` : ""}<td class="cn">${row}${cs.map(HD).some(Boolean) ? `<small>${cs.map(c => HD(c) || 0).reduce((a, b) => a + b, 0)}人</small>` : ""}</td>`;
+    UP_T.forEach((_, k) => {
+      if (k >= 5) { h += `<td class="none"></td>`; return; }
+      const sl = d + (k + 1), seen = new Set();
+      // 高等科は2専攻を1行に。同じ授業でも専攻で中身（洋裁／和裁）が違えば2つ並べる
+      const key = (i, c) => [i, selName(L[i]) || L[i].label[c], RB(L[i], c), TB(L[i], c).join()].join("|");
+      const chips = cs.flatMap(c => ids().filter(i => P.cur[i] === sl && L[i].classes.includes(c) && !seen.has(key(i, c)) && seen.add(key(i, c))).map(i => schoolChip(i, c)));
+      h += `<td class="slot" data-slot="${sl}">${chips.join("")}</td>`;
+    });
+    h += `</tr>`;
+  });
+  const groups = []; (DATA.lower?.[d] || []).forEach(r => { const g = groups.find(g => g.school === r.school); g ? g.rows.push(r) : groups.push({school: r.school, rows: [r]}); });
+  groups.forEach(g => {
+    h += `<tr class="sp"><td colspan="8"></td></tr><tr><td class="vt" rowspan="${g.rows.length + 1}">${/委託/.test(g.school) ? "委託訓練" : g.school}</td><td></td>`;
+    // 下の段は4コマ。上の6列（1〜5限＋6）に、時刻の近い所へ並べる
+    h += `<th colspan="2">1<small>${LO_T[0]}</small></th><th>2<small>${LO_T[1]}</small></th><th>3<small>${LO_T[2]}</small></th><th colspan="2">4<small>${LO_T[3]}</small></th></tr>`;
+    g.rows.forEach(r => {
+      const c = k => { const x = r.cells[k] || {}; return `<div class="lw"><div>${x.subject || ""}${x.room ? `<br><small>${x.room}</small>` : ""}</div><div>${x.teacher || ""}</div></div>`; };
+      h += `<tr><td class="cn">${r.class}</td><td class="lo" colspan="2">${c(1)}</td><td class="lo">${c(2)}</td><td class="lo">${c(3)}</td><td class="lo" colspan="2">${c(4)}</td></tr>`;
+    });
+  });
+  return h + `</table><p style="font-size:12px;color:var(--sub);margin:4px 0 0">下の段（委託訓練・専門学校）は、令和8年度前期の時間割のままです（動かせません）。</p>`;
+}
+function weekGrid(filter, extra) {
+  let h = `<table class="grid"><tr><th class="p"></th>${DAYS.map(d => `<th>${d}</th>`).join("")}</tr>`;
+  for (const p of PERIODS) {
+    if (p === 4) h += `<tr><td colspan="6" class="lunch">昼休み</td></tr>`;
+    h += `<tr><th class="p">${p}<small>${["9:20","10:20","11:20","13:00","14:00"][p - 1]}</small></th>`;
+    for (const d of DAYS) {
+      const s = d + p, ex = extra ? extra(s) : {};
+      h += `<td class="slot ${ex.off ? "off" : ""}" data-slot="${s}">${ids().filter(i => P.cur[i] === s && filter(L[i])).map(i => chipHTML(i, view === "class" ? pick : null)).join("")}${ex.html || ""}</td>`;
+    }
+    h += "</tr>";
+  }
+  return h + "</table>";
+}
+function weekBox(title, sub, rows, total, need) {
+  const p = Math.round(total / need * 100);
+  return `<div class="box"><h4>${title}</h4><div class="sub">${sub}</div>
+    <div class="total"><div class="ring" style="--p:${Math.min(p, 100)}"><span>${p}%</span></div><div><b>${total} / ${need}</b> コマ<div class="sub" style="margin:0">${total === need ? "必要な数がすべて入っています" : "足りないコマがあります"}</div></div></div>
+    ${rows.map(r => `<div class="cr" data-sub="${r.key || ""}"><div class="nm">${r.name}<small>${r.who || ""}</small></div><div class="dots">${"<i></i>".repeat(r.n)}</div><div class="num ${r.n !== r.need ? "ng" : ""}">${r.n}/${r.need}</div></div>`).join("")}</div>`;
+}
+function classWeek(c) {
+  const rows = {};
+  L.forEach((x, i) => { if (!x.classes.includes(c)) return; const k = subj(x, c); const r = (rows[k] ??= {key:k, name:k, n:0, need:0, t:new Set()}); r.need++; if (P.cur[i]) r.n++; if (!selName(x)) TB(x, c).forEach(t => r.t.add(t)); });
+  const list = Object.values(rows).sort((a, b) => b.need - a.need).map(r => ({...r, who: [...r.t].map(T).join("・")}));
+  return weekBox(`${c}の1週間`, "必要なコマ数。科目に指を乗せると、左の時間割でその授業が目立ちます", list, list.reduce((a, r) => a + r.n, 0), list.reduce((a, r) => a + r.need, 0));
+}
+function teacherWeek(t) {
+  const rows = {};
+  L.forEach((x, i) => { if (!x.teachers.includes(t)) return; const k = `${x.classes.map(short).join("・")} ${subj(x, x.classes[0])}`; const r = (rows[k] ??= {name:k, n:0, need:0}); r.n++; r.need++; });
+  const list = Object.values(rows).sort((a, b) => b.n - a.n);
+  const days = DATA.teacherDays[t];
+  return weekBox(`${T(t)}の1週間`, `${DATA.teacherKinds[t] || ""}${days ? "｜来る日：" + days.join("") : ""}`, list, list.reduce((a, r) => a + r.n, 0), list.reduce((a, r) => a + r.need, 0));
+}
+function allWeek() {
+  const list = CLASSES.map(c => { const n = L.filter(x => x.classes.includes(c)).length; return {name:c, n, need:n}; });
+  return weekBox("全学科の1週間", "学科ごとの授業の数", list.map(r => ({...r, n: r.n, need: r.need})).map(r => ({...r, n: r.n})), list.reduce((a, r) => a + r.n, 0), list.reduce((a, r) => a + r.need, 0)).replace(/<div class="dots">.*?<\/div>/g, '<div class="dots"></div>');
+}
+function checkBox() {
+  const g = GROUPS.map((g, gi) => {
+    const items = RULES.filter(r => r.g === gi).flatMap(r => result[r.key].map((it, k) => ({...it, rule: r.key, k, lv: r.lv})));
+    const st = items.some(x => x.lv === "ng") ? "ng" : items.length ? "warn" : "ok";
+    return `<div class="grp ${st}"><div class="gh"><span class="ic">${st === "ok" ? "✓" : st === "ng" ? "✕" : "!"}</span><div><div class="gt">${g.name}</div><div class="gs">${st === "ok" ? g.ok : items.length + "件。押すと場所へ移ります"}</div></div></div>
+      ${items.length ? `<ul>${items.map(it => `<li data-rule="${it.rule}" data-k="${it.k}">${it.text}</li>`).join("")}</ul>` : ""}</div>`;
+  }).join("");
+  const ch = ids().filter(i => P.cur[i] !== P.slots[i]);
+  const hd = Object.entries(P.hand).flatMap(([i, o]) => Object.entries(o).map(([c, r]) => `<li>${short(c)} ${subj(L[i], c)}（${P.cur[i]}）：${r || "教室なし"}</li>`));
+  return `<div class="box"><h4>条件の確認</h4><div class="sub">動かすたびに、すぐに調べ直します</div>${g}
+    ${hd.length ? `<div class="sub" style="margin-top:10px">教室を書き込んだ所</div><ol class="changes">${hd.join("")}</ol>` : ""}
+    ${ch.length ? `<div class="sub" style="margin-top:10px">動かした所</div><ol class="changes">${ch.map(i => `<li>${L[i].classes.map(short).join("・")} ${subj(L[i], L[i].classes[0])}：${P.slots[i]}→${P.cur[i]}</li>`).join("")}</ol>` : ""}</div>`;
+}
+function board() {
+  result = check(P.cur);
+  const bad = new Set(), badT = new Set();
+  RULES.forEach(r => result[r.key].forEach(it => it.ids.forEach(i => { L[i].classes.forEach(c => bad.add(c)); L[i].teachers.forEach(t => badT.add(t)); })));
+  let pk = "", grid, week;
+  if (view === "class") {
+    if (!CLASSES.includes(pick)) pick = CLASSES[0];
+    pk = CLASSES.map(c => `<button class="pill ${pick === c ? "on" : ""}" data-pick="${c}">${c}${HD(c) ? `（${HD(c)}人）` : ""}${bad.has(c) ? '<span class="dot"></span>' : ""}</button>`).join("");
+    grid = weekGrid(x => x.classes.includes(pick)); week = classWeek(pick);
+  } else if (view === "teacher") {
+    const ts = [...new Set(L.flatMap(x => x.teachers))].sort((a, b) => a === "理事長" ? 1 : b === "理事長" ? -1 : a.length - b.length || a.localeCompare(b));
+    if (!ts.includes(pick)) pick = ts[0];
+    pk = `<select id="tsel">${ts.map(t => `<option value="${t}" ${pick === t ? "selected" : ""}>${badT.has(t) ? "● " : ""}${T(t)}</option>`).join("")}</select>`;
+    const days = DATA.teacherDays[pick], busy = DATA.busy[pick] || [];
+    grid = weekGrid(x => x.teachers.includes(pick), s => ({off: days && !days.includes(s[0]), html: (busy.includes(s) ? `<div class="busy">専門学校・訓練</div>` : "") + (days && !days.includes(s[0]) ? `<div class="busy">来ない日</div>` : "")}));
+    week = teacherWeek(pick);
+  } else if (view === "school") {
+    pk = `<div class="jump"><span>曜日へ移る</span>${DAYS.map(d => `<button class="pill" data-jump="${d}">${d}曜日</button>`).join("")}</div>`;
+    grid = DAYS.map(d => `<div class="sbd" id="sday-${d}">${schoolBoard(d)}</div>`).join("");
+    week = allWeek();
+  } else {
+    grid = `<table class="all"><tr><th rowspan="2"></th>${DAYS.map(d => `<th colspan="5">${d}</th>`).join("")}</tr><tr>${DAYS.map(() => PERIODS.map(p => `<th>${p}</th>`).join("")).join("")}</tr>` +
+      CLASSES.map(c => `<tr><td class="cls">${short(c)}${HD(c) ? `<small style="display:block;font-weight:400;color:var(--sub)">${HD(c)}人</small>` : ""}</td>${SLOTS.map(s => `<td class="slot" data-slot="${s}">${ids().filter(i => P.cur[i] === s && L[i].classes.includes(c)).map(i => chipHTML(i, c)).join("")}</td>`).join("")}</tr>`).join("") + "</table>";
+    week = allWeek();
+  }
+  const moved = ids().filter(i => P.cur[i] !== P.slots[i]).length;
+  $("board").classList.toggle("edit", editing);
+  $("board").innerHTML = `
+    <div class="bar"><div class="seg">${plans.map(p => `<button class="${p === P ? "on" : ""}" data-plan="${p.key}">${p.key === "now" ? "今の時間割" : p.name}</button>`).join("")}</div>
+      <span class="planname"><b>${P.title}</b></span><span class="sp"></span>
+      <div class="mode" role="group" aria-label="モード"><button data-mode="view" class="${editing ? "" : "on"}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>見るだけ</button><button data-mode="edit" class="${editing ? "on" : ""}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 9l-3 3 3 3M9 5l3-3 3 3M15 19l-3 3-3-3M19 9l3 3-3 3M2 12h20M12 2v20"/></svg>動かす</button></div>
+      <button class="ghostbtn" id="undo" ${P.hist.length ? "" : "disabled"}>1つ戻す</button><button class="ghostbtn" id="reset">元に戻す</button><button class="outbtn" id="out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>印刷・Excel</button></div>
+    ${moved ? `<div class="moved-bar">「${P.title}」で、最初の形から <b>${moved}件</b> 動いています。<span class="sp"></span><button class="ghostbtn" id="reset2">すべて最初の形に戻す</button></div>` : ""}
+    <div class="bar"><div class="seg">${(LAYOUT === "school" ? [["school","全体（学校の様式）"],["class","学科"],["teacher","先生"]] : [["class","学科"],["teacher","先生"],["all","全体"]]).map(([k, n]) => `<button class="${view === k ? "on" : ""}" data-view="${k}">${n}</button>`).join("")}</div></div>
+    <div class="modebar ${editing ? "edit" : "view"}">${editing
+      ? `<b>動かすモード</b><span>授業をつかんで、入れたいマスへ運びます。<i style="background:#eaf9ee;box-shadow:inset 0 0 0 1px #1d8a3a"></i>緑のマスはそのまま置けます。<i style="background:#ffeceb;box-shadow:inset 0 0 0 1px #d70015"></i>赤のマスは条件が崩れます。<b style="font-size:inherit">授業を押すと、教室を書き込めます。</b>終わったら「見るだけ」に戻すと、触っても動きません。</span>`
+      : `<b>見るだけモード</b><span>触っても授業は動きません。授業を動かして直したい時は、上の「動かす」を押します。</span>`}</div>
+    <div class="chips">${pk}</div>
+    <div class="layout ${view === "school" ? "wide" : ""}"><div><div class="scroll">${grid}</div>
+      <div class="legend">${[["--c-gen","普通教科"],["--c-biz","経理・情報"],["--c-care","福祉"],["--c-fash","服飾"],["--c-move","実技・体育"],["--c-sel","選択授業"],["--c-hr","HR"]].map(([v, n]) => `<span><i style="background:var(${v})"></i>${n}</span>`).join("")}<span>● 動かした授業</span></div></div>
+      <div class="side">${week}${checkBox()}</div></div>`;
+}
+function render() { board(); cards(); }
+
+// ===== つかんで動かす =====
+let drag = null;
+let tryDrag = null;
+// 見るだけの時：マウスで引っぱる、または指で長押しすると、切り替え方を知らせる（指でのスクロールでは出さない）
+const HINT = "今は見るだけモードです。動かす時は、上の「動かす」を押してください";
+document.addEventListener("pointerdown", e => { const c = e.target.closest("#board .chip"); if (!c) return; if (editing) { drag = {id: +c.dataset.id, x: e.clientX, y: e.clientY, started: false, chip: c}; return; }
+  tryDrag = {x: e.clientX, y: e.clientY, mouse: e.pointerType === "mouse", t: e.pointerType === "mouse" ? null : setTimeout(() => { tryDrag = null; toast(HINT); }, 600)}; });
+const endTry = () => { if (tryDrag) clearTimeout(tryDrag.t); tryDrag = null; };
+document.addEventListener("pointermove", e => { if (!tryDrag || Math.hypot(e.clientX - tryDrag.x, e.clientY - tryDrag.y) < 10) return; const m = tryDrag.mouse; endTry(); if (m) toast(HINT); });
+document.addEventListener("pointerup", endTry); document.addEventListener("pointercancel", endTry);
+document.addEventListener("pointermove", e => {
+  if (!drag) return;
+  if (!drag.started) {
+    if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 6) return;
+    drag.started = true;
+    drag.ghost = drag.chip.cloneNode(true); drag.ghost.classList.add("ghost"); document.body.appendChild(drag.ghost);
+    const base = ngCount(result);
+    document.querySelectorAll("td.slot").forEach(td => { if (td.dataset.slot !== P.cur[drag.id]) td.classList.add(ngCount(check(moveTo(P.cur, drag.id, td.dataset.slot))) > base ? "cant" : "can"); });
+  }
+  e.preventDefault();
+  if (e.clientY < 70) scrollBy(0, -18); else if (e.clientY > innerHeight - 70) scrollBy(0, 18);
+  drag.ghost.style.left = e.clientX - 70 + "px"; drag.ghost.style.top = e.clientY - 22 + "px";
+  document.querySelectorAll("td.over").forEach(td => td.classList.remove("over"));
+  document.elementFromPoint(e.clientX, e.clientY)?.closest("td.slot")?.classList.add("over");
+}, {passive: false});
+document.addEventListener("pointerup", e => {
+  if (!drag) return;
+  const d = drag; drag = null;
+  if (!d.started) return;
+  d.ghost.remove();
+  const td = document.elementFromPoint(e.clientX, e.clientY)?.closest("td.slot");
+  document.querySelectorAll("td.slot").forEach(t => t.classList.remove("can", "cant", "over"));
+  if (td) doMove(d.id, td.dataset.slot);
+});
+// 右の科目に指を乗せると、その科目のマスが光る
+document.addEventListener("pointerover", e => {
+  const r = e.target.closest(".cr[data-sub]");
+  document.querySelectorAll(".chip.dim").forEach(c => c.classList.remove("dim"));
+  if (r && r.dataset.sub) document.querySelectorAll("#board table.grid .chip").forEach(c => { if (c.dataset.sub !== r.dataset.sub) c.classList.add("dim"); });
+});
+document.addEventListener("click", e => {
+  const t = e.target;
+  const pl = t.closest("[data-plan]"); if (pl) { P = plans.find(p => p.key === pl.dataset.plan); render(); if (pl.classList.contains("plan")) $("edit").scrollIntoView({behavior:"smooth"}); return; }
+  const v = t.closest("[data-view]"); if (v) { view = v.dataset.view; pick = null; board(); return; }
+  const pk = t.closest("[data-pick]"); if (pk) { pick = pk.dataset.pick; board(); return; }
+  const jp = t.closest("[data-jump]"); if (jp) { $("sday-" + jp.dataset.jump)?.scrollIntoView({behavior: "smooth"}); return; }
+  if (t.closest("#out")) { outDialog(); return; }
+  if (t.id === "undo" && P.hist.length) { P.cur = P.hist.pop(); save(); render(); toast("1つ戻しました"); return; }
+  const md = t.closest("[data-mode]");
+  if (md) { const e = md.dataset.mode === "edit"; if (e !== editing) { editing = e; board(); toast(editing ? "動かすモードにしました。授業をつかんで運べます" : "見るだけモードにしました。触っても動きません"); } return; }
+
+  if (t.id === "reset" || t.id === "reset2") { if (confirm(`動かした所と書き込んだ教室をすべて戻し、「${P.title}」の最初の形に戻します。よろしいですか？`)) { P.hist.push(P.cur.slice()); P.cur = P.slots.slice(); P.hand = {}; save(); render(); } return; }
+  if (t.id === "csv") { csvOut(); return; }
+  const chip = t.closest("#board .chip");
+  if (chip) { if (editing && view !== "teacher") roomDialog(+chip.dataset.id, chip.dataset.cls); else if (!editing && view !== "teacher") toast("教室を書き込む時は、上の「動かす」を押してから授業を押します"); return; }
+  const li = t.closest("li[data-rule]");
+  if (li) {
+    const it = result[li.dataset.rule][+li.dataset.k];
+    if (it.teacher) { view = "teacher"; pick = it.teacher; } else { view = "class"; pick = it.cls || L[it.ids[0]].classes[0]; }
+    board();
+    it.ids.forEach(i => document.querySelectorAll(`.chip[data-id="${i}"]`).forEach(el => { el.classList.add("flash"); el.scrollIntoView({block:"center", behavior:"smooth"}); }));
+  }
+});
+document.addEventListener("change", e => { if (e.target.id === "tsel") { pick = e.target.value; board(); } });
+// ===== 教室を書き込む =====
+// 授業を押すと、そのクラスの教室を選び直す・自由に書き込める。合同で同じ教室のクラスもまとめて変える
+function roomDialog(id, c) {
+  const x = L[id];
+  if (!c || selName(x)) { toast("選択授業は各コースの教室なので、ここでは書き換えられません"); return; }
+  const s = P.cur[id], now = RB(x, c);
+  const mates = x.classes.filter(k => k !== c && RB(x, k) === now && now);
+  const all = [...new Set([...Object.keys(DATA.cap || {}), ...L.flatMap(y => y.allRooms), ...plans.flatMap(p => Object.values(p.hand).flatMap(o => Object.values(o)))])].filter(Boolean)
+    .sort((a, b) => a.localeCompare(b, "ja"));
+  const users = r => ids().filter(i => i !== id && P.cur[i] === s && LR(L[i]).has(r)).map(i => `${L[i].classes.map(short).join("・")} ${subj(L[i], L[i].classes[0])}`);
+  const n = [c, ...mates].reduce((a, k) => a + (HD(k) || 0), 0);
+  const d = document.createElement("div"); d.className = "rdlg";
+  d.innerHTML = `<div class="in"><h3>${short(c)} ${subj(x, c)}　${s}限</h3>
+    <div class="sub">今の教室：<b>${now || "なし"}</b>${n ? `｜生徒 ${n}人` : ""}。教室を押すか、下の欄に書き込みます。</div>
+    <div class="rl">${all.map(r => { const u = users(r), cap = DATA.cap?.[r];
+      return `<button data-r="${r}" class="${r === now ? "on" : ""} ${u.length ? "use" : ""}">${r}<small>${cap ? `定員${cap}人` : ""}${u.length ? `${cap ? "・" : ""}使用中：${u.join("、")}` : ""}${cap && n > cap ? "・人数が多い" : ""}</small></button>`; }).join("")}</div>
+    <div class="row"><input type="text" id="rtx" value="${now}" placeholder="教室名を書き込む（例：本館2階奥）"></div>
+    ${mates.length ? `<label class="row"><input type="checkbox" id="rmt" checked>合同の ${mates.map(short).join("・")} も同じ教室にする</label>` : ""}
+    <div class="btns">${HAND(x, c) ? `<button data-a="clear">AIの教室に戻す</button>` : ""}<button data-a="cancel">やめる</button><button data-a="ok" class="pri">書き込む</button></div></div>`;
+  document.body.appendChild(d);
+  const close = () => d.remove();
+  const targets = () => $("rmt")?.checked ? [c, ...mates] : [c];
+  const apply = r => {
+    const cs = targets();
+    cs.forEach(k => { (P.hand[id] ??= {})[k] = r; });
+    save(); render(); close(); toast(`${cs.map(short).join("・")}の教室を「${r || "なし"}」にしました`);
+  };
+  d.addEventListener("click", e => {
+    if (e.target === d) return close();
+    const b = e.target.closest("[data-r]"); if (b) { $("rtx").value = b.dataset.r; d.querySelectorAll("[data-r]").forEach(y => y.classList.toggle("on", y === b)); return; }
+    const a = e.target.closest("[data-a]")?.dataset.a;
+    if (a === "cancel") close();
+    if (a === "ok") apply($("rtx").value.trim());
+    if (a === "clear") { targets().forEach(k => delete P.hand[id]?.[k]); if (P.hand[id] && !Object.keys(P.hand[id]).length) delete P.hand[id]; save(); render(); close(); toast("AIが決めた教室に戻しました"); }
+  });
+  $("rtx").addEventListener("keydown", e => { if (e.key === "Enter") apply($("rtx").value.trim()); });
+}
+// ===== 学校の様式（今まで使っている紙の時間割と同じ形。1曜日1枚） =====
+// 上：立修館高等専修学校（9学科×1〜6限、各限「教科（2行目に教室）｜担当」）
+// 下：委託訓練・文化産業専門学校（1〜4コマ）。下の段は令和8年度前期の時間割のまま
+const UP_T = ["9:20〜10:10", "10:20〜11:10", "11:20〜12:10", "13:00〜13:50", "14:00〜14:50", ""];
+const LO_T = ["9:00〜10:30", "10:40〜12:10", "13:10〜14:40", "14:50〜16:20"];
+const ROWS = ["高等科1年", "高等科2年", "高等科3年", "経理情報科1年", "経理情報科2年", "経理情報科3年", "福祉科1年", "福祉科2年", "福祉科3年"];
+const SCH_TITLE = "令和8年度前期時間割";
+function upperCell(row, s) {
+  const parts = [], seen = new Set();
+  CLASSES.filter(c => c.startsWith(row)).forEach(c => ids().filter(i => P.cur[i] === s && L[i].classes.includes(c)).forEach(i => {
+    const x = L[i], sel = selName(x), sj = sel || x.label[c], r = sel ? "各教室" : RB(x, c), t = sel ? "" : TB(x, c).map(T).join("・");
+    const k = [sj, r, t].join("|"); if (seen.has(k)) return; seen.add(k); parts.push({sj, r, t});
+  }));
+  if (!parts.length) return ["", ""];
+  if (parts.length === 1) return [parts[0].sj + (parts[0].r ? "\n" + parts[0].r : ""), parts[0].t];
+  return [parts.map(q => q.sj + (q.r ? `（${q.r}）` : "")).join("\n"), parts.map(q => q.t).join("\n")];
+}
+// 表を「マスの並び」として作る（印刷とExcelで同じものを使う）。列：曜日・学校・学科名・24本（上は1限=4本、下は1コマ=6本）
+function sheetModel(d) {
+  const rows = [], C = (t, o = {}) => ({t: t ?? "", cs: 1, rs: 1, ...o});
+  const lower = DATA.lower?.[d] || [];
+  const groups = []; lower.forEach(r => { const g = groups.find(g => g.school === r.school); g ? g.rows.push(r) : groups.push({school: r.school, rows: [r]}); });
+  const total = 3 + ROWS.length + groups.reduce((a, g) => a + 1 + 2 + g.rows.length, 0);
+  rows.push([C(d, {rs: total, k: "vt day"}), C("学科名", {cs: 2, rs: 3, k: "hd"}), ...UP_T.map((_, k) => C(String(k + 1), {cs: 4, k: "hd"}))]);
+  rows.push(UP_T.map(t => C(t, {cs: 4, k: "hd"})));
+  rows.push(UP_T.flatMap(() => [C("教科", {cs: 3, k: "hd"}), C("担当", {k: "hd"})]));
+  ROWS.forEach((row, n) => {
+    const r = n === 0 ? [C("立修館高等専修学校", {rs: ROWS.length, k: "vt"})] : [];
+    r.push(C(row, {k: "cn"}));
+    UP_T.forEach((_, k) => { const [a, b] = k < 5 ? upperCell(row, d + (k + 1)) : ["", ""]; r.push(C(a, {cs: 3}), C(b)); });
+    rows.push(r);
+  });
+  groups.forEach(g => {
+    rows.push([C("", {cs: 26, k: "sp"})]);
+    const name = /委託/.test(g.school) ? "委託訓練" : g.school;
+    rows.push([C(name, {rs: 2 + g.rows.length, k: "vt"}), C("", {rs: 2, k: "hd"}), ...LO_T.map((t, k) => C(`${k + 1}（${t}）`, {cs: 6, k: "hd"}))]);
+    rows.push(LO_T.flatMap(() => [C("教科", {cs: 4, k: "hd"}), C("担当", {cs: 2, k: "hd"})]));
+    g.rows.forEach(r => rows.push([C(r.class, {k: "cn"}), ...LO_T.flatMap((_, k) => { const x = r.cells[k + 1] || {}; return [C((x.subject || "") + (x.room ? "\n" + x.room : ""), {cs: 4}), C(x.teacher || "", {cs: 2})]; })]));
+  });
+  return rows;
+}
+const esc = v => String(v).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+function sheetHTML(d) {
+  const w = [7, 5, 18].concat(Array.from({length: 24}, (_, k) => [5.6, 4.6, 4.6, 6.6][k % 4]));
+  const sum = w.reduce((a, b) => a + b, 0);
+  return `<h1>${SCH_TITLE}</h1><table class="sc"><colgroup>${w.map(x => `<col style="width:${(x / sum * 100).toFixed(2)}%">`).join("")}</colgroup>` +
+    sheetModel(d).map(r => `<tr class="${r[0]?.k === "sp" ? "sp" : ""}">${r.map(c => `<td class="${c.k || ""}"${c.cs > 1 ? ` colspan="${c.cs}"` : ""}${c.rs > 1 ? ` rowspan="${c.rs}"` : ""}>${esc(c.t)}</td>`).join("")}</tr>`).join("") +
+    `</table><div class="foot"><span>${P.title}（試作アプリで作成・先生のお名前は記号）</span><span>${new Date().toLocaleDateString("ja-JP", {month: "long", day: "numeric"})}</span></div>`;
+}
+// Excel（.xlsx）：曜日ごとに1シート。紙と同じ並び・結合・罫線・A4横1枚に収める設定
+async function excelOut() {
+  toast("Excelを作っています…");
+  if (!window.ExcelJS) await new Promise((ok, ng) => { const sc = document.createElement("script"); sc.src = "https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"; sc.onload = ok; sc.onerror = ng; document.head.appendChild(sc); }).catch(() => null);
+  if (!window.ExcelJS) { toast("Excelの部品を読み込めませんでした。ネットにつながっているか確かめてください"); return; }
+  const wb = new ExcelJS.Workbook();
+  const thin = {style: "thin", color: {argb: "FF333333"}};
+  for (const d of DAYS) {
+    const ws = wb.addWorksheet(d + "曜", {pageSetup: {paperSize: 9, orientation: "landscape", fitToPage: true, fitToWidth: 1, fitToHeight: 1, margins: {left: .3, right: .3, top: .4, bottom: .4, header: .2, footer: .2}}});
+    ws.columns = [4, 4, 13].concat(Array.from({length: 24}, (_, k) => [5.2, 4.2, 4.2, 6.6][k % 4])).map(w => ({width: w}));
+    ws.mergeCells(1, 1, 1, 27);
+    Object.assign(ws.getCell(1, 1), {value: SCH_TITLE}); ws.getCell(1, 1).font = {size: 16, bold: true}; ws.getCell(1, 1).alignment = {horizontal: "center"};
+    ws.getRow(1).height = 24;
+    const used = new Set(), model = sheetModel(d);
+    model.forEach((r, ri) => {
+      const row = ri + 2; let col = 1, lines = 1;
+      for (const c of r) {
+        while (used.has(row + ":" + col)) col++;
+        for (let a = 0; a < c.rs; a++) for (let b = 0; b < c.cs; b++) used.add((row + a) + ":" + (col + b));
+        if (c.rs > 1 || c.cs > 1) ws.mergeCells(row, col, row + c.rs - 1, col + c.cs - 1);
+        const cell = ws.getCell(row, col), k = c.k || "";
+        cell.value = c.t;
+        cell.font = {size: k.includes("day") ? 22 : 8, bold: /cn|vt/.test(k)};
+        cell.alignment = {wrapText: true, vertical: "middle", horizontal: /hd|cn|vt/.test(k) ? "center" : "left", ...(k.includes("vt") ? {textRotation: "vertical"} : {})};
+        if (k.includes("hd")) cell.fill = {type: "pattern", pattern: "solid", fgColor: {argb: "FFF2F2F2"}};
+        if (k === "sp") cell.fill = {type: "pattern", pattern: "solid", fgColor: {argb: "FFFFF3A0"}};
+        if (c.rs === 1 && !k.includes("vt")) lines = Math.max(lines, String(c.t).split("\n").length);
+        col += c.cs;
+      }
+      ws.getRow(row).height = r[0]?.k === "sp" ? 4 : 11.5 * lines + 3;
+    });
+    const last = model.length + 1;
+    for (let r = 2; r <= last; r++) for (let c = 1; c <= 27; c++) ws.getCell(r, c).border = {top: thin, left: thin, bottom: thin, right: thin};
+    ws.getCell(last + 1, 27).value = new Date().toLocaleDateString("ja-JP", {month: "long", day: "numeric"});
+    ws.getCell(last + 1, 27).alignment = {horizontal: "right"};
+    ws.getCell(last + 1, 1).value = `${P.title}（試作アプリで作成・先生のお名前は記号）`;
+  }
+  const buf = await wb.xlsx.writeBuffer();
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([buf], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
+  a.download = `時間割_${P.title}.xlsx`; a.click(); toast("Excelを書き出しました（曜日ごとに1シート）");
+}
+// ===== 印刷 =====
+// 学科・先生の画面では、その1週間を1枚。全体の画面では、全学科の一覧1枚＋学科ごとの1週間（1学科1枚）
+// kind：school＝全学科（学校の様式・曜日ごとに1枚）／one＝今見ている学科か先生の1週間／classes＝全学科の1週間（1学科1枚）／teachers＝全先生の1週間（1人1枚）
+function printOut(kind) {
+  const cell = (i, c) => `<div class="s">${c ? L[i].label[c] : `${L[i].classes.map(short).join("・")} ${subj(L[i], L[i].classes[0])}`}</div>${RM(L[i], c) ? `<div class="t">${RM(L[i], c)}</div>` : ""}<div class="t">${TB(L[i], c).map(T).join("・")}</div>`;
+  const week = (title, filter, c) => {
+    let h = `<h1>${title}</h1><table class="wk"><tr><th class="p"></th>${DAYS.map(d => `<th>${d}</th>`).join("")}</tr>`;
+    for (const p of PERIODS) {
+      if (p === 4) h += `<tr class="lunch"><td colspan="6">昼休み</td></tr>`;
+      h += `<tr><th class="p">${p}</th>${DAYS.map(d => `<td>${ids().filter(i => P.cur[i] === d + p && filter(L[i])).map(i => cell(i, c)).join("<hr style='border:0;border-top:.5pt dashed #999;margin:1mm 0'>")}</td>`).join("")}</tr>`;
+    }
+    return h + "</table>";
+  };
+  const meta = `<p class="meta">令和8年度前期　${P.title}　｜　${new Date().toLocaleDateString("ja-JP")} 印刷</p>`;
+  const cls = c => `<div class="pg">${week(`${c}　時間割`, x => x.classes.includes(c), c)}${meta}</div>`;
+  const tea = t => `<div class="pg">${week(`${T(t)}　時間割`, x => x.teachers.includes(t), null)}${meta}</div>`;
+  let h;
+  if (kind === "school") h = DAYS.map(d => `<div class="pg sch">${sheetHTML(d)}</div>`).join("");
+  else if (kind === "classes") h = CLASSES.map(cls).join("");
+  else if (kind === "teachers") h = allTeachers().map(tea).join("");
+  else h = view === "teacher" ? tea(pick) : cls(view === "class" && pick ? pick : CLASSES[0]);
+  $("print").innerHTML = h;
+  window.print();
+}
+const allTeachers = () => [...new Set(L.flatMap(x => x.teachers))].sort((a, b) => a === "理事長" ? 1 : b === "理事長" ? -1 : a.length - b.length || a.localeCompare(b));
+function csvOut() {
+  const rows = [["学科","曜日","時限","授業","先生","教室"]];
+  for (const c of CLASSES) for (const s of SLOTS) L.forEach((x, i) => { if (P.cur[i] === s && x.classes.includes(c)) rows.push([c, s[0], s.slice(1), x.label[c], TB(x, c).map(T).join("・"), RM(x, c)]); });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["\ufeff" + rows.map(r => r.map(v => `"${v}"`).join(",")).join("\n")], {type:"text/csv"})); a.download = `時間割_${P.title}.csv`; a.click();
+}
+// 「印刷・Excel」ボタン：何が出るかを言葉で選べるようにする
+function outDialog() {
+  const one = view === "teacher" ? `${T(pick)}の1週間` : `${view === "class" && pick ? pick : CLASSES[0]}の1週間`;
+  const d = document.createElement("div"); d.className = "rdlg outdlg";
+  const opt = (k, ic, b, sp) => `<button class="opt" data-k="${k}"><span class="ic">${ic}</span><div><b>${b}</b><span>${sp}</span></div></button>`;
+  d.innerHTML = `<div class="in"><h3>印刷・Excel</h3><div class="sub">「${P.title}」を、今の並び（動かした所・書き込んだ教室も入ります）で出します。</div>
+    <h4>印刷する（A4横）</h4>
+    ${opt("school", "🗓", "全学科の時間割（学校の様式）", "今お使いの紙と同じ形。月〜金を1曜日1枚、全5枚")}
+    ${opt("one", "📄", one, "今見ている画面の1枚だけ")}
+    ${opt("classes", "📚", "学科ごとの時間割（全学科）", `1学科1枚、全${CLASSES.length}枚`)}
+    ${opt("teachers", "👤", "先生ごとの時間割（全員）", `1人1枚、全${allTeachers().length}枚`)}
+    <h4>データで出す</h4>
+    ${opt("xlsx", "📊", "Excel（学校の様式）", "紙と同じ形。曜日ごとに1シート。Excelでそのまま直せます")}
+    ${opt("csv", "🧾", "一覧（CSV）", "学科・曜日・時限・授業・先生・教室を1行ずつ")}
+    <div class="btns"><button data-a="cancel">閉じる</button></div></div>`;
+  document.body.appendChild(d);
+  d.addEventListener("click", e => {
+    if (e.target === d || e.target.closest("[data-a=cancel]")) return d.remove();
+    const k = e.target.closest("[data-k]")?.dataset.k; if (!k) return;
+    d.remove();
+    if (k === "xlsx") excelOut(); else if (k === "csv") csvOut(); else printOut(k);
+  });
+}
+let tt; function toast(m) { const t = $("toast"); t.textContent = m; t.classList.add("show"); clearTimeout(tt); tt = setTimeout(() => t.classList.remove("show"), 2400); }
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), {threshold: .12});
+document.querySelectorAll(".rv").forEach(el => io.observe(el));
+hero(); render();
+</script>
+</body>
+</html>
